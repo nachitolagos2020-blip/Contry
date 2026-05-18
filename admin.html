@@ -68,7 +68,152 @@
 
   </div>
 
-  <script src="admin.js"></script>
+ <script type="module">
+
+import { initializeApp }
+
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+
+  getFirestore,
+  collection,
+  getDocs
+
+}
+
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+// FIREBASE
+
+const firebaseConfig = {
+
+  apiKey: "AIzaSyDVI76qVw8v00Kr6sG537oIP2yw4AdR5-g",
+
+  authDomain: "contry-c4953.firebaseapp.com",
+
+  projectId: "contry-c4953",
+
+  storageBucket: "contry-c4953.firebasestorage.app",
+
+  messagingSenderId: "775091873432",
+
+  appId: "1:775091873432:web:93331d930a4aa1063c52ed"
+
+};
+
+// INICIAR
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+// ELEMENTOS
+
+const contenedor =
+  document.getElementById("contenedorRegistros");
+
+const total =
+  document.getElementById("totalRegistros");
+
+const buscador =
+  document.getElementById("buscador");
+
+// CARGAR
+
+let registros = [];
+
+async function cargarRegistros() {
+
+  const querySnapshot =
+
+    await getDocs(
+      collection(db,"registros")
+    );
+
+  registros = [];
+
+  querySnapshot.forEach((doc) => {
+
+    registros.push(doc.data());
+
+  });
+
+  mostrarRegistros(registros);
+
+}
+
+function mostrarRegistros(lista) {
+
+  contenedor.innerHTML = "";
+
+  total.innerHTML = lista.length;
+
+  lista.reverse().forEach((registro) => {
+
+    contenedor.innerHTML += `
+
+      <div class="registro-card">
+
+        <div class="registro-header">
+
+          <h3>${registro.nombre}</h3>
+
+          <span>${registro.estado}</span>
+
+        </div>
+
+        <p class="descripcion">
+
+          ${registro.descripcion}
+
+        </p>
+
+        <div class="info">
+
+          <p>
+            📍 ${registro.coordenadas}
+          </p>
+
+          <p>
+            🕒 ${registro.fecha}
+          </p>
+        </div>
+
+      </div>
+
+    `;
+
+  });
+
+}
+
+// BUSCADOR
+
+buscador.addEventListener("input", () => {
+
+  const texto =
+    buscador.value.toLowerCase();
+
+  const filtrados = registros.filter(
+
+    (r) =>
+
+      r.nombre
+      .toLowerCase()
+      .includes(texto)
+
+  );
+
+  mostrarRegistros(filtrados);
+
+});
+
+// INICIAR
+
+cargarRegistros();
+
+</script>
 
 </body>
 </html>
