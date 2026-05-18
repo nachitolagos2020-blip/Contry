@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+  <title>Panel Admin</title>
+
+  <link rel="stylesheet" href="admin.css">
+
+</head>
+
+<body>
+
+  <div class="background"></div>
+
+  <div class="admin-layout">
+
+    <aside class="sidebar">
+
+      <h1>Country Admin</h1>
+
+      <p>
+        Supervisión general
+      </p>
+
+      <div class="sidebar-box">
+
+        <span id="totalRegistros">
+          0
+        </span>
+
+        registros
+
+      </div>
+
+    </aside>
+
+    <main class="admin-main">
+
+      <div class="admin-top">
+
+        <div>
+
+          <h2>Respuestas</h2>
+
+          <p>
+            Registro completo de trabajadores
+          </p>
+
+        </div>
+
+        <input
+          type="text"
+          id="buscador"
+          placeholder="Buscar trabajador..."
+        >
+
+      </div>
+
+      <div id="contenedorRegistros"></div>
+
+    </main>
+
+  </div>
+
+  <script src="admin.js"></script>
+
+</body>
+</html>

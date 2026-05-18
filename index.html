@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+  <meta charset="UTF-8" />
+
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0" />
+
+  <title>Control Country</title>
+
+  <link rel="stylesheet" href="Country.css">
+
+</head>
+
+<body>
+
+  <div class="background"></div>
+
+  <div class="container">
+
+    <div class="top-bar">
+
+      <div>
+
+        <h1>Control de Trabajadores</h1>
+
+        <p class="subtitle">
+          Registro de tareas y supervisión
+        </p>
+
+      </div>
+
+      <div class="badge">
+        Área Segura
+      </div>
+
+    </div>
+
+    <div id="estadoGPS" class="gps-box">
+      Verificando ubicación...
+    </div>
+
+    <form id="formulario">
+
+      <div class="grid">
+
+        <div>
+
+          <label>Nombre y Apellido</label>
+
+          <input
+            type="text"
+            id="nombre"
+            placeholder="Ej: Juan Pérez"
+            required
+          >
+
+        </div>
+
+        <div>
+
+          <label>Estado</label>
+
+          <select id="estado" required>
+
+            <option value="">
+              Seleccionar
+            </option>
+
+            <option value="Ok">
+               Ok
+            </option>
+
+            <option value="Observacion">
+               Observación
+            </option>
+
+            <option value="Urgente">
+               Urgente
+            </option>
+
+          </select>
+
+        </div>
+
+      </div>
+
+      <div>
+
+        <label>Observaciones</label>
+
+        <textarea
+          id="descripcion"
+          placeholder="Describa el estado del trabajo"
+          required
+        ></textarea>
+
+      </div>
+
+      <div>
+
+        <label>Foto</label>
+
+        <input
+          type="file"
+          id="foto"
+          accept="image/*"
+          capture="environment"
+          required
+        >
+
+      </div>
+
+      <button type="submit">
+        Enviar
+      </button>
+
+    </form>
+
+    <div id="mensaje"></div>
+
+  </div>
+
+  <script src="Country.js"></script>
+
+</body>
+</html>
