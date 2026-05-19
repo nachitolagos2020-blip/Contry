@@ -212,9 +212,7 @@ navigator.geolocation.getCurrentPosition(
 
 // ENVIAR
 
-formulario.addEventListener("submit",
-
-async (e) => {
+formulario.addEventListener("submit", async (e) => {
 
   e.preventDefault();
 
@@ -227,9 +225,51 @@ async (e) => {
   const descripcion =
     document.getElementById("descripcion").value;
 
+  const foto =
+    document.getElementById("foto").files[0];
+
+  let imagenURL = "";
+
+  // SUBIR FOTO
+
+  if (foto) {
+
+    const data = new FormData();
+
+    data.append("file", foto);
+
+    data.append(
+      "upload_preset",
+      "country_upload"
+    );
+
+    const respuesta = await fetch(
+
+      "https://api.cloudinary.com/v1_1/TU_CLOUD_NAME/image/upload",
+
+      {
+
+        method: "POST",
+
+        body: data
+
+      }
+
+    );
+
+    const resultado =
+      await respuesta.json();
+
+    imagenURL =
+      resultado.secure_url;
+
+  }
+
+  // GUARDAR EN FIREBASE
+
   await addDoc(
 
-    collection(db,"registros"),
+    collection(db, "registros"),
 
     {
 
@@ -240,12 +280,25 @@ async (e) => {
       coordenadas:
         latitud + "," + longitud,
 
+      imagen:
+        imagenURL,
+
       fecha:
         new Date().toLocaleString()
 
     }
 
   );
+
+  mensaje.innerHTML =
+    "✅ Parte enviado correctamente";
+
+  mensaje.style.color =
+    "#22c55e";
+
+  formulario.reset();
+
+
 
   mensaje.innerHTML =
     "✅ Parte enviado correctamente";
