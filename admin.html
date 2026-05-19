@@ -181,7 +181,21 @@ function mostrarRegistros(lista) {
         </div>
 
       </div>
+     ${registro.imagen ? `
 
+  <a
+    href="${registro.imagen}"
+    target="_blank"
+  >
+
+    <img
+      src="${registro.imagen}"
+      class="preview-img"
+    >
+
+  </a>
+
+` : ""}
     `;
 
   });
