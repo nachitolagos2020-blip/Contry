@@ -200,5 +200,28 @@ body{
   #buscador{
     width:100%;
   }
+.preview-img{
 
+  width:100%;
+  max-height:300px;
+
+  object-fit:cover;
+
+  border-radius:18px;
+
+  margin-top:15px;
+
+  border:2px solid rgba(255,255,255,0.08);
+
+  cursor:pointer;
+
+  transition:0.3s;
+
+}
+
+.preview-img:hover{
+
+  transform:scale(1.01);
+
+}
 }
