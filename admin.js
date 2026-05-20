@@ -1,3 +1,42 @@
+import { initializeApp }
+
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+
+  getFirestore,
+  collection,
+  onSnapshot,
+  query,
+  orderBy
+
+}
+
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+// FIREBASE
+
+const firebaseConfig = {
+
+  apiKey: "AIzaSyDVI76qVw8v00Kr6sG537oIP2yw4AdR5-g",
+
+  authDomain: "contry-c4953.firebaseapp.com",
+
+  projectId: "contry-c4953",
+
+  storageBucket: "contry-c4953.firebasestorage.app",
+
+  messagingSenderId: "775091873432",
+
+  appId: "1:775091873432:web:93331d930a4aa1063c52ed"
+
+};
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+// ELEMENTOS
 
 const contenedor =
   document.getElementById("contenedorRegistros");
@@ -8,17 +47,59 @@ const buscador =
 const totalRegistros =
   document.getElementById("totalRegistros");
 
-let registros =
-  JSON.parse(localStorage.getItem("registros")) || [];
+const botonesSector =
+  document.querySelectorAll(".sector-btn");
 
-totalRegistros.innerHTML =
-  registros.length;
+// LOGIN SIMPLE
+
+const password =
+  prompt("Contraseña");
+
+if(password !== "country2026"){
+
+  document.body.innerHTML = `
+
+    <div class="login-error">
+
+      Contraseña incorrecta
+
+    </div>
+
+  `;
+
+  throw new Error("Sin acceso");
+
+}
+
+// VARIABLES
+
+let sectorActual = "Campo";
+
+let todosLosRegistros = [];
+
+// BOTONES SECTOR
+
+botonesSector.forEach((boton) => {
+
+  boton.addEventListener("click", () => {
+
+    sectorActual =
+      boton.dataset.sector;
+
+    filtrarRegistros();
+
+  });
+
+});
 
 // MOSTRAR
 
 function mostrarRegistros(lista){
 
   contenedor.innerHTML = "";
+
+  totalRegistros.innerHTML =
+    lista.length;
 
   lista.forEach((registro) => {
 
@@ -32,23 +113,11 @@ function mostrarRegistros(lista){
       claseEstado = "urgente";
     }
 
-    // SACAR COORDENADAS
-
-    let coords = "Sin ubicación";
-
-    if(registro.ubicacion){
-
-      coords =
-        registro.ubicacion
-          .replace("https://maps.google.com/?q=","");
-
-    }
-
     contenedor.innerHTML += `
 
       <div class="registro-card">
 
-        <div class="registro-header">
+        <div class="registro-top">
 
           <div>
 
@@ -56,51 +125,45 @@ function mostrarRegistros(lista){
               ${registro.nombre}
             </h3>
 
-            <span class="estado ${claseEstado}">
-              ${registro.estado}
-            </span>
+            <div class="sector-mini">
+              ${registro.sector}
+            </div>
 
           </div>
 
-          <div class="fecha">
-            ${registro.fecha}
-          </div>
+          <span class="estado ${claseEstado}">
+            ${registro.estado}
+          </span>
 
         </div>
 
-        <div class="registro-grid">
+        <div class="registro-desc">
 
-          <div class="registro-box">
-
-            <div class="titulo-box">
-              Observaciones
-            </div>
-
-            <p>
-              ${registro.descripcion}
-            </p>
-
-          </div>
-
-          <div class="registro-box">
-
-            <div class="titulo-box">
-              Coordenadas
-            </div>
-
-            <p>
-              ${coords}
-            </p>
-
-          </div>
+          ${registro.descripcion}
 
         </div>
 
-        <img
-          src="${registro.imagen}"
-          class="registro-img"
-          onclick="window.open('${registro.imagen}')"
-        >
+        <div class="registro-info">
+
+          <span>
+            📍 ${registro.coordenadas}
+          </span>
+
+          <span>
+            🕒 ${registro.fecha}
+          </span>
+
+        </div>
+
+        ${registro.imagen ? `
+
+          <img
+            src="${registro.imagen}"
+            class="registro-img"
+            onclick="window.open('${registro.imagen}')"
+          >
+
+        ` : ""}
 
       </div>
 
@@ -110,21 +173,55 @@ function mostrarRegistros(lista){
 
 }
 
-mostrarRegistros(registros);
+// FILTRAR
+
+function filtrarRegistros(){
+
+  const valor =
+    buscador.value.toLowerCase();
+
+  const filtrados =
+    todosLosRegistros.filter((r) =>
+
+      r.sector === sectorActual &&
+
+      r.nombre.toLowerCase()
+      .includes(valor)
+
+    );
+
+  mostrarRegistros(filtrados);
+
+}
 
 // BUSCADOR
 
 buscador.addEventListener("input", () => {
 
-  const valor =
-    buscador.value.toLowerCase();
+  filtrarRegistros();
 
-  const filtrados = registros.filter((r) =>
+});
 
-    r.nombre.toLowerCase().includes(valor)
+// FIREBASE REALTIME
 
-  );
+const q = query(
 
-  mostrarRegistros(filtrados);
+  collection(db, "registros"),
+
+  orderBy("fecha", "desc")
+
+);
+
+onSnapshot(q, (snapshot) => {
+
+  todosLosRegistros = [];
+
+  snapshot.forEach((doc) => {
+
+    todosLosRegistros.push(doc.data());
+
+  });
+
+  filtrarRegistros();
 
 });
