@@ -8,7 +8,7 @@
   <meta name="viewport"
         content="width=device-width, initial-scale=1.0">
 
-  <title>Panel Admin</title>
+  <title>Country Admin</title>
 
   <link rel="stylesheet" href="admin.css">
 
@@ -20,12 +20,16 @@
 
   <div class="admin-layout">
 
+    <!-- SIDEBAR -->
+
     <aside class="sidebar">
 
-      <h1>Country Admin</h1>
+      <h1>
+        Country Admin
+      </h1>
 
-      <p>
-        Supervisión general
+      <p class="sidebar-sub">
+        Supervisión General
       </p>
 
       <div class="sidebar-box">
@@ -38,7 +42,55 @@
 
       </div>
 
+      <div class="sectores">
+
+        <button class="sector-btn active"
+                data-sector="Campo">
+
+          🌱 Campo
+
+        </button>
+
+        <button class="sector-btn"
+                data-sector="Electricidad">
+
+          ⚡ Electricidad
+
+        </button>
+
+        <button class="sector-btn"
+                data-sector="Plomeria">
+
+          🚰 Plomeria
+
+        </button>
+
+        <button class="sector-btn"
+                data-sector="Tecnica">
+
+          🛠 Tecnica
+
+        </button>
+
+        <button class="sector-btn"
+                data-sector="Mantenimiento General">
+
+          🔧 Mantenimiento
+
+        </button>
+
+        <button class="sector-btn"
+                data-sector="Taller Mecánico">
+
+          🚗 Taller
+
+        </button>
+
+      </div>
+
     </aside>
+
+    <!-- MAIN -->
 
     <main class="admin-main">
 
@@ -46,10 +98,12 @@
 
         <div>
 
-          <h2>Respuestas</h2>
+          <h2>
+            Informes
+          </h2>
 
           <p>
-            Registro completo de trabajadores
+            Registros en tiempo real
           </p>
 
         </div>
@@ -68,7 +122,7 @@
 
   </div>
 
- <script type="module">
+<script type="module">
 
 import { initializeApp }
 
@@ -78,11 +132,34 @@ import {
 
   getFirestore,
   collection,
-  getDocs
+  onSnapshot,
+  query,
+  orderBy
 
 }
 
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+// LOGIN
+
+const password =
+  prompt("Contraseña");
+
+if(password !== "country2026"){
+
+  document.body.innerHTML = `
+
+    <div class="login-error">
+
+      Contraseña incorrecta
+
+    </div>
+
+  `;
+
+  throw new Error("Sin acceso");
+
+}
 
 // FIREBASE
 
@@ -102,8 +179,6 @@ const firebaseConfig = {
 
 };
 
-// INICIAR
-
 const app = initializeApp(firebaseConfig);
 
 const db = getFirestore(app);
@@ -119,37 +194,56 @@ const total =
 const buscador =
   document.getElementById("buscador");
 
-// CARGAR
+const botonesSector =
+  document.querySelectorAll(".sector-btn");
+
+// VARIABLES
 
 let registros = [];
 
-async function cargarRegistros() {
+let sectorActual = "Campo";
 
-  const querySnapshot =
+// CAMBIAR SECTOR
 
-    await getDocs(
-      collection(db,"registros")
+botonesSector.forEach((boton) => {
+
+  boton.addEventListener("click", () => {
+
+    botonesSector.forEach((b) =>
+      b.classList.remove("active")
     );
 
-  registros = [];
+    boton.classList.add("active");
 
-  querySnapshot.forEach((doc) => {
+    sectorActual =
+      boton.dataset.sector;
 
-    registros.push(doc.data());
+    filtrar();
 
   });
 
-  mostrarRegistros(registros);
+});
 
-}
+// MOSTRAR
 
-function mostrarRegistros(lista) {
+function mostrarRegistros(lista){
 
   contenedor.innerHTML = "";
 
-  total.innerHTML = lista.length;
+  total.innerHTML =
+    lista.length;
 
-  lista.reverse().forEach((registro) => {
+  lista.forEach((registro) => {
+
+    let colorEstado = "#2563eb";
+
+    if(registro.estado === "Observacion"){
+      colorEstado = "#eab308";
+    }
+
+    if(registro.estado === "Urgente"){
+      colorEstado = "#ef4444";
+    }
 
     contenedor.innerHTML += `
 
@@ -157,17 +251,36 @@ function mostrarRegistros(lista) {
 
         <div class="registro-header">
 
-          <h3>${registro.nombre}</h3>
+          <div>
 
-          <span>${registro.estado}</span>
+            <h3>
+              ${registro.nombre}
+            </h3>
+
+            <div class="sector-mini">
+
+              ${registro.sector}
+
+            </div>
+
+          </div>
+
+          <span
+            class="estado"
+            style="background:${colorEstado}"
+          >
+
+            ${registro.estado}
+
+          </span>
 
         </div>
 
-        <p class="descripcion">
+        <div class="descripcion">
 
           ${registro.descripcion}
 
-        </p>
+        </div>
 
         <div class="info">
 
@@ -178,33 +291,36 @@ function mostrarRegistros(lista) {
           <p>
             🕒 ${registro.fecha}
           </p>
+
         </div>
 
+        ${registro.imagen ? `
+
+          <a
+            href="${registro.imagen}"
+            target="_blank"
+          >
+
+            <img
+              src="${registro.imagen}"
+              class="preview-img"
+            >
+
+          </a>
+
+        ` : ""}
+
       </div>
-     ${registro.imagen ? `
 
-  <a
-    href="${registro.imagen}"
-    target="_blank"
-  >
-
-    <img
-      src="${registro.imagen}"
-      class="preview-img"
-    >
-
-  </a>
-
-` : ""}
     `;
 
   });
 
 }
 
-// BUSCADOR
+// FILTRAR
 
-buscador.addEventListener("input", () => {
+function filtrar(){
 
   const texto =
     buscador.value.toLowerCase();
@@ -212,6 +328,8 @@ buscador.addEventListener("input", () => {
   const filtrados = registros.filter(
 
     (r) =>
+
+      r.sector === sectorActual &&
 
       r.nombre
       .toLowerCase()
@@ -221,11 +339,39 @@ buscador.addEventListener("input", () => {
 
   mostrarRegistros(filtrados);
 
+}
+
+// BUSCADOR
+
+buscador.addEventListener("input", () => {
+
+  filtrar();
+
 });
 
-// INICIAR
+// FIREBASE REALTIME
 
-cargarRegistros();
+const q = query(
+
+  collection(db, "registros"),
+
+  orderBy("fecha", "desc")
+
+);
+
+onSnapshot(q, (snapshot) => {
+
+  registros = [];
+
+  snapshot.forEach((doc) => {
+
+    registros.push(doc.data());
+
+  });
+
+  filtrar();
+
+});
 
 </script>
 
