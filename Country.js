@@ -4,23 +4,28 @@ const formulario = document.getElementById("formulario");
 
 const mensaje = document.getElementById("mensaje");
 
-let ubicacionActual = "No disponible";
+// CAMBIAR SEGÚN EL HTML
+
+const sector = "Campo";
+
+// GPS
+
+let latitud = "";
+let longitud = "";
 
 navigator.geolocation.getCurrentPosition(
 
   (posicion) => {
 
-    const lat = posicion.coords.latitude;
-    const lng = posicion.coords.longitude;
+    latitud =
+      posicion.coords.latitude;
 
-    ubicacionActual =
-      `https://maps.google.com/?q=${lat},${lng}`;
+    longitud =
+      posicion.coords.longitude;
 
     estadoGPS.innerHTML =
-      `📍 Latitud: ${lat.toFixed(5)}
-   | Longitud: ${lng.toFixed(5)}`;
 
-    estadoGPS.style.background = "#166534";
+      `📍 ${latitud.toFixed(5)}, ${longitud.toFixed(5)}`;
 
     formulario.classList.remove("hidden");
 
@@ -31,12 +36,13 @@ navigator.geolocation.getCurrentPosition(
     estadoGPS.innerHTML =
       "❌ Debes activar la ubicación GPS";
 
-    estadoGPS.style.background = "#991b1b";
   }
 
 );
 
-formulario.addEventListener("submit", (e) => {
+// ENVIAR
+
+formulario.addEventListener("submit", async (e) => {
 
   e.preventDefault();
 
@@ -52,44 +58,90 @@ formulario.addEventListener("submit", (e) => {
   const foto =
     document.getElementById("foto").files[0];
 
-  const reader = new FileReader();
+  let imagenURL = "";
 
-  reader.onload = function(){
+  // SUBIR FOTO
 
-    const datos = {
+  if (foto) {
+
+    const data = new FormData();
+
+    data.append("file", foto);
+
+    data.append(
+      "upload_preset",
+      "country_upload"
+    );
+
+    const respuesta = await fetch(
+
+      "https://api.cloudinary.com/v1_1/dddhyrkd8/image/upload",
+
+      {
+
+        method: "POST",
+
+        body: data
+
+      }
+
+    );
+
+    const resultado =
+      await respuesta.json();
+
+    imagenURL =
+      resultado.secure_url;
+
+  }
+
+  // GUARDAR EN FIREBASE
+
+  await addDoc(
+
+    collection(db, "registros"),
+
+    {
 
       nombre,
       estado,
       descripcion,
-      ubicacion: ubicacionActual,
-      imagen: reader.result,
-      fecha: new Date().toLocaleString()
 
-    };
+      sector,
 
-    const registros =
-      JSON.parse(localStorage.getItem("registros")) || [];
+      coordenadas:
+        latitud + "," + longitud,
 
-    registros.unshift(datos);
+      imagen:
+        imagenURL,
 
-    localStorage.setItem(
-      "registros",
-      JSON.stringify(registros)
-    );
+      fecha:
+        new Date().toLocaleString()
 
-    mensaje.innerHTML =
-      "✅ Parte enviado correctamente";
+    }
 
-    mensaje.style.color = "#22c55e";
+  );
 
-    formulario.reset();
+  // PANTALLA FINAL
 
-  };
+  document.querySelector(".container").innerHTML = `
 
-  if(foto){
+    <div class="success-screen">
 
-    reader.readAsDataURL(foto);
+      <div class="success-icon">
+        ✅
+      </div>
 
-  }
+      <h2>
+        Muchas Gracias
+      </h2>
+
+      <p>
+        El parte fue enviado correctamente.
+      </p>
+
+    </div>
+
+  `;
 
 });
