@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+  <meta charset="UTF-8" />
+
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0" />
+
+  <title>Control Country</title>
+
+  <link rel="stylesheet" href="Country.css">
+
+</head>
+
+<body>
+
+  <div class="background"></div>
+
+  <div class="container">
+
+    <div class="top-bar">
+
+      <div>
+
+        <h1>Control de Trabajadores</h1>
+
+        <p class="subtitle">
+          Registro de tareas y supervisión
+        </p>
+
+      </div>
+
+      <div class="badge">
+        Área Segura
+      </div>
+
+    </div>
+
+    <div id="estadoGPS" class="gps-box">
+      Verificando ubicación...
+    </div>
+
+    <form id="formulario">
+
+      <div class="grid">
+
+        <div>
+
+          <label>Nombre y Apellido</label>
+
+          <input
+            type="text"
+            id="nombre"
+            placeholder="Ej: Juan Pérez"
+            required
+          >
+
+        </div>
+
+        <div>
+
+          <label>Estado</label>
+
+          <select id="estado" required>
+
+            <option value="">
+              Seleccionar
+            </option>
+
+            <option value="Ok">
+              Ok
+            </option>
+
+            <option value="Observacion">
+              Observación
+            </option>
+
+            <option value="Urgente">
+              Urgente
+            </option>
+
+          </select>
+
+        </div>
+
+      </div>
+
+      <div>
+
+        <label>Observaciones</label>
+
+        <textarea
+          id="descripcion"
+          placeholder="Describa el estado del trabajo"
+          required
+        ></textarea>
+
+      </div>
+
+      <div>
+
+        <label>Foto</label>
+
+        <input
+          type="file"
+          id="foto"
+          accept="image/*"
+          capture="environment"
+        >
+
+      </div>
+
+      <button type="submit">
+        Enviar
+      </button>
+
+    </form>
+
+    <div id="mensaje"></div>
+
+  </div>
+
+<script type="module">
+
+import { initializeApp }
+
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+
+  getFirestore,
+  collection,
+  addDoc
+
+}
+
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+// FIREBASE
+
+const firebaseConfig = {
+
+  apiKey: "AIzaSyDVI76qVw8v00Kr6sG537oIP2yw4AdR5-g",
+
+  authDomain: "contry-c4953.firebaseapp.com",
+
+  projectId: "contry-c4953",
+
+  storageBucket: "contry-c4953.firebasestorage.app",
+
+  messagingSenderId: "775091873432",
+
+  appId: "1:775091873432:web:93331d930a4aa1063c52ed"
+
+};
+
+// INICIAR
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+// ELEMENTOS
+
+const formulario =
+  document.getElementById("formulario");
+
+const estadoGPS =
+  document.getElementById("estadoGPS");
+
+// CAMBIAR SEGÚN EL HTML
+
+const sector = "Electricidad";
+
+// GPS
+
+let latitud = "";
+let longitud = "";
+
+navigator.geolocation.getCurrentPosition(
+
+  (posicion) => {
+
+    latitud =
+      posicion.coords.latitude;
+
+    longitud =
+      posicion.coords.longitude;
+
+    estadoGPS.innerHTML =
+
+      `📍 ${latitud.toFixed(5)}, ${longitud.toFixed(5)}`;
+
+  },
+
+  () => {
+
+    estadoGPS.innerHTML =
+      "❌ Debes activar la ubicación GPS";
+
+  }
+
+);
+
+// ENVIAR
+
+formulario.addEventListener("submit", async (e) => {
+
+  e.preventDefault();
+
+  const nombre =
+    document.getElementById("nombre").value;
+
+  const estado =
+    document.getElementById("estado").value;
+
+  const descripcion =
+    document.getElementById("descripcion").value;
+
+  const foto =
+    document.getElementById("foto").files[0];
+
+  let imagenURL = "";
+
+  // SUBIR FOTO
+
+  if (foto) {
+
+    const data = new FormData();
+
+    data.append("file", foto);
+
+    data.append(
+      "upload_preset",
+      "country_upload"
+    );
+
+    const respuesta = await fetch(
+
+      "https://api.cloudinary.com/v1_1/dddhyrkd8/image/upload",
+
+      {
+
+        method: "POST",
+
+        body: data
+
+      }
+
+    );
+
+    const resultado =
+      await respuesta.json();
+
+    imagenURL =
+      resultado.secure_url;
+
+  }
+
+  // GUARDAR EN FIREBASE
+
+  await addDoc(
+
+    collection(db, "registros"),
+
+    {
+
+      nombre,
+      estado,
+      descripcion,
+
+      sector,
+
+      coordenadas:
+        latitud + "," + longitud,
+
+      imagen:
+        imagenURL,
+
+      fecha:
+        new Date().toLocaleString()
+
+    }
+
+  );
+
+  // PANTALLA FINAL
+
+  document.querySelector(".container").innerHTML = `
+
+    <div class="success-screen">
+
+      <div class="success-icon">
+        ✅
+      </div>
+
+      <h2>
+        Muchas Gracias
+      </h2>
+
+      <p>
+        El parte fue enviado correctamente.
+      </p>
+
+    </div>
+
+  `;
+
+});
+
+</script>
+
+</body>
+</html>
