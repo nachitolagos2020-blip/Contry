@@ -10,7 +10,8 @@
 
   <title>Country Admin</title>
 
-  <link rel="stylesheet" href="admin.css">
+  <link rel="stylesheet"
+        href="admin.css">
 
 </head>
 
@@ -53,70 +54,61 @@
 
       </div>
 
-      <div class="sectores">
+      <div class="sidebar-actions">
 
-        <button class="sector-btn active"
-                data-sector="Campo">
-          🌱 Campo
+        <button id="modoBtn">
+          🌙 Modo Oscuro
         </button>
 
-        <button class="sector-btn"
-                data-sector="Electricidad">
-          ⚡ Electricidad
-        </button>
-
-        <button class="sector-btn"
-                data-sector="Plomeria">
-          🚰 Plomeria
-        </button>
-
-        <button class="sector-btn"
-                data-sector="Tecnica">
-          🛠 Tecnica
-        </button>
-
-        <button class="sector-btn"
-                data-sector="Mantenimiento">
-          🔧 Mantenimiento
-        </button>
-
-        <button class="sector-btn"
-                data-sector="Taller">
-          🚗 Taller
+        <button id="exportarPDF">
+          📄 Exportar PDF
         </button>
 
       </div>
 
-      <!-- BOTTOM -->
+      <div class="sectores">
 
-      <div class="sidebar-bottom">
+        <button class="sector-btn active"
+                data-sector="Campo">
 
-        <button id="exportarSeleccionados">
-          📄 Exportar
+          🌱 Campo
+
         </button>
 
-        <button id="borrarSeleccionados">
-          🗑 Eliminar
+        <button class="sector-btn"
+                data-sector="Electricidad">
+
+          ⚡ Electricidad
+
         </button>
 
-        <div class="theme-box">
+        <button class="sector-btn"
+                data-sector="Plomeria">
 
-          <span>
-            🌙 Tema Oscuro
-          </span>
+          🚰 Plomeria
 
-          <label class="switch">
+        </button>
 
-            <input
-              type="checkbox"
-              id="themeToggle"
-            >
+        <button class="sector-btn"
+                data-sector="Tecnica">
 
-            <span class="slider"></span>
+          🛠 Tecnica
 
-          </label>
+        </button>
 
-        </div>
+        <button class="sector-btn"
+                data-sector="Mantenimiento">
+
+          🔧 Mantenimiento
+
+        </button>
+
+        <button class="sector-btn"
+                data-sector="Taller">
+
+          🚗 Taller
+
+        </button>
 
       </div>
 
@@ -155,11 +147,19 @@
               Todos
             </option>
 
+            <option value="Ok">
+              Ok
+            </option>
+
+            <option value="Observacion">
+              Observacion
+            </option>
+
             <option value="Urgente">
               Urgente
             </option>
 
-            <option value="En Proceso">
+            <option value="EnProceso">
               En Proceso
             </option>
 
@@ -169,13 +169,10 @@
 
           </select>
 
-          <select id="filtroFecha">
-
-            <option value="">
-              Fecha
-            </option>
-
-          </select>
+          <input
+            type="date"
+            id="filtroFecha"
+          >
 
           <div class="fecha-actual"
                id="fechaActual">
@@ -198,4 +195,5 @@
   </script>
 
 </body>
+
 </html>
