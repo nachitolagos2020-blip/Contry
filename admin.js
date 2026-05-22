@@ -1,349 +1,47 @@
 import { initializeApp }
 
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-
-import {
-
-  getFirestore,
-  collection,
-  onSnapshot,
-  query
-
-}
-
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-// LOGIN
-
-const password =
-  prompt("Contraseña");
-
-if(password !== "country2026"){
-
-  document.body.innerHTML = `
-
-    <div class="login-error">
-
-      Contraseña incorrecta
-
-    </div>
-
-  `;
-
-  throw new Error("Sin acceso");
-
-}
-
-// FIREBASE
-
-const firebaseConfig = {
-
-  apiKey: "AIzaSyDVI76qVw8v00Kr6sG537oIP2yw4AdR5-g",
-
-  authDomain: "contry-c4953.firebaseapp.com",
-
-  projectId: "contry-c4953",
-
-  storageBucket: "contry-c4953.firebasestorage.app",
-
-  messagingSenderId: "775091873432",
-
-  appId: "1:775091873432:web:93331d930a4aa1063c52ed"
-
-};
-
-const app = initializeApp(firebaseConfig);
-
-const db = getFirestore(app);
-
-// ELEMENTOS
-
-const contenedor =
-  document.getElementById("contenedorRegistros");
-
-const totalRegistros =
-  document.getElementById("totalRegistros");
-
-const buscador =
-  document.getElementById("buscador");
-
-const filtroEstado =
-  document.getElementById("filtroEstado");
-
-const filtroFecha =
-  document.getElementById("filtroFecha");
-
-const botonesSector =
-  document.querySelectorAll(".sector-btn");
-
-const sidebar =
-  document.getElementById("sidebar");
-
-const menuToggle =
-  document.getElementById("menuToggle");
-
-const adminMain =
-  document.getElementById("adminMain");
-
-const fechaActual =
-  document.getElementById("fechaActual");
-
-// MENU
-
-menuToggle.addEventListener("click", () => {
-
-  sidebar.classList.toggle("hidden");
-
-  adminMain.classList.toggle("expandido");
-
-});
-
-// FECHA Y HORA
-
-function actualizarHora(){
-
-  const ahora = new Date();
-
-  fechaActual.innerHTML =
-
-    ahora.toLocaleDateString("es-AR") +
-
-    " • " +
-
-    ahora.toLocaleTimeString("es-AR",{
-
-      hour:"2-digit",
-      minute:"2-digit"
-
-    });
-
-}
-
-setInterval(actualizarHora,1000);
-
-actualizarHora();
-
-// VARIABLES
-
-let registros = [];
-
-let sectorActual = "Campo";
-
-// SECTORES
-
-botonesSector.forEach((boton) => {
-
-  boton.addEventListener("click", () => {
-
-    botonesSector.forEach((b) => {
-
-      b.classList.remove("active");
-
-    });
-
-    boton.classList.add("active");
-
-    sectorActual =
-      boton.dataset.sector;
-
-    filtrar();
-
-  });
-
-});
-
-// EXPANDIR TEXTO
-
-window.toggleTexto = function(textoId,cardId){
-
-  const texto =
-    document.getElementById(textoId);
-
-  const card =
-    document.getElementById(cardId);
-
-  texto.classList.toggle("oculta");
-
-  card.classList.toggle("expandido");
-
-};
-
-// MOSTRAR
-
-function mostrar(lista){
-
-  contenedor.innerHTML = "";
-
-  totalRegistros.innerHTML =
-    lista.length;
-
-  lista.forEach((registro,index) => {
-
-    let colorEstado = "#3b82f6";
-
-    if(registro.estado === "Observacion"){
-      colorEstado = "#f59e0b";
-    }
-
-    if(registro.estado === "Urgente"){
-      colorEstado = "#ef4444";
-    }
-
-    const textoId =
-      "texto" + index;
-
-    const cardId =
-      "card" + index;
-
-    const textoLargo =
-      registro.descripcion &&
-      registro.descripcion.length > 180;
-
-    contenedor.innerHTML += `
-
-      <div class="registro-card"
-           id="${cardId}">
-
-        <div class="registro-header">
-
-          <div>
-
-            <h3>
-              ${registro.nombre}
-            </h3>
-
-            <div class="sector-mini">
-              ${registro.sector}
-            </div>
-
-          </div>
-
-          <div class="estado"
-               style="background:${colorEstado}">
-
-            ${registro.estado}
-
-          </div>
-
-        </div>
-
-        <div
-          class="descripcion ${textoLargo ? "oculta" : ""}"
-          id="${textoId}"
-        >
-
-          ${registro.descripcion}
-
-        </div>
-
-        ${textoLargo ? `
-
-          <span
-            class="ver-mas"
-            onclick="toggleTexto('${textoId}','${cardId}')"
-          >
-
-            Ver más
-
-          </span>
-
-        ` : ""}
-
-        <div class="info">
-
-          <span>
-            📍 ${registro.coordenadas}
-          </span>
-
-          <span>
-            🕒 ${registro.fecha}
-          </span>
-
-        </div>
-
-        ${registro.imagen ? `
-
-          <div class="foto-box">
-
-            <img
-              src="${registro.imagen}"
-              class="preview-img"
-            >
-
-            <a
-              href="${registro.imagen}"
-              target="_blank"
-              class="ver-foto"
-            >
-
-              Ver Imagen
-
-            </a>
-
-          </div>
-
-        ` : ""}
-
-      </div>
-
-    `;
-
-  });
-
-}
-
-// FILTRAR
-
 function filtrar(){
 
   const texto =
-    buscador.value.toLowerCase();
+  buscador.value.toLowerCase();
 
   const estado =
-    filtroEstado.value;
+  filtroEstado.value;
 
   const fecha =
-    filtroFecha.value;
+  filtroFecha.value;
 
   const filtrados =
-    registros.filter((r) => {
+  registros.filter((r)=>{
 
-      const coincideNombre =
+    const coincideNombre =
+    r.nombre.toLowerCase().includes(texto);
 
-        r.nombre
-        .toLowerCase()
-        .includes(texto);
+    const coincideSector =
+    r.sector === sectorActual;
 
-      const coincideSector =
+    const coincideEstado =
+    estado === "Todos" ||
+    r.estado === estado;
 
-        r.sector === sectorActual;
+    let coincideFecha = true;
 
-      const coincideEstado =
+    if(fecha){
 
-        estado === "Todos" ||
+      coincideFecha =
+      r.fecha &&
+      r.fecha.includes(fecha);
 
-        r.estado === estado;
+    }
 
-      let coincideFecha = true;
+    return (
+      coincideNombre &&
+      coincideSector &&
+      coincideEstado &&
+      coincideFecha
+    );
 
-      if(fecha){
-
-        coincideFecha =
-          r.fecha &&
-          r.fecha.includes(fecha);
-
-      }
-
-      return (
-
-        coincideNombre &&
-        coincideSector &&
-        coincideEstado &&
-        coincideFecha
-
-      );
-
-    });
+  });
 
   mostrar(filtrados);
 
@@ -351,61 +49,55 @@ function filtrar(){
 
 // EVENTOS
 
-buscador.addEventListener("input", filtrar);
+buscador.addEventListener("input",filtrar);
+filtroEstado.addEventListener("change",filtrar);
+filtroFecha.addEventListener("change",filtrar);
 
-filtroEstado.addEventListener("change", filtrar);
+// PDF
 
-filtroFecha.addEventListener("change", filtrar);
+exportarPDF.addEventListener("click",()=>{
 
-// FECHAS
+  const { jsPDF } = window.jspdf;
 
-function generarFechas(){
+  const pdf = new jsPDF();
 
-  const hoy =
-    new Date();
+  pdf.text("Informes Country",20,20);
 
-  const fin =
-    new Date("2026-12-31");
+  let y = 40;
 
-  while(hoy <= fin){
+  registros.forEach((r)=>{
 
-    const fecha =
+    pdf.text(`${r.nombre} - ${r.estado}`,20,y);
 
-      hoy.toISOString().split("T")[0];
+    y += 10;
 
-    filtroFecha.innerHTML += `
+    if(y > 270){
+      pdf.addPage();
+      y = 20;
+    }
 
-      <option value="${fecha}">
-        ${fecha}
-      </option>
+  });
 
-    `;
+  pdf.save("informes.pdf");
 
-    hoy.setDate(
-      hoy.getDate() + 1
-    );
-
-  }
-
-}
-
-generarFechas();
+});
 
 // FIREBASE
 
 const q = query(
-
-  collection(db, "registros")
-
+  collection(db,"registros")
 );
 
-onSnapshot(q, (snapshot) => {
+onSnapshot(q,(snapshot)=>{
 
   registros = [];
 
-  snapshot.forEach((doc) => {
+  snapshot.forEach((docu)=>{
 
-    registros.push(doc.data());
+    registros.push({
+      id:docu.id,
+      ...docu.data()
+    });
 
   });
 
