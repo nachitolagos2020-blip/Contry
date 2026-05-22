@@ -10,7 +10,8 @@
 
   <title>Country Admin</title>
 
-  <link rel="stylesheet" href="admin.css">
+  <link rel="stylesheet"
+        href="admin.css">
 
 </head>
 
@@ -18,7 +19,7 @@
 
   <div class="background"></div>
 
-  <!-- MENU -->
+  <!-- BOTON MENU -->
 
   <button id="menuToggle">
 
@@ -108,6 +109,8 @@
     <main class="admin-main"
           id="adminMain">
 
+      <!-- TOP -->
+
       <div class="top-panel">
 
         <div class="top-info">
@@ -150,13 +153,10 @@
 
           </select>
 
-          <select id="filtroFecha">
-
-            <option value="">
-              Fecha
-            </option>
-
-          </select>
+          <input
+            type="date"
+            id="filtroFecha"
+          >
 
           <div class="fecha-actual"
                id="fechaActual">
@@ -166,6 +166,8 @@
         </div>
 
       </div>
+
+      <!-- REGISTROS -->
 
       <div id="contenedorRegistros"></div>
 
