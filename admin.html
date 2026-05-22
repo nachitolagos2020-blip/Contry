@@ -18,6 +18,8 @@
 
   <div class="background"></div>
 
+  <!-- MENU -->
+
   <button id="menuToggle">
     ☰
   </button>
@@ -85,15 +87,19 @@
 
       </div>
 
-      <!-- BOTTOM ACTIONS -->
+      <!-- BOTTOM -->
 
       <div class="sidebar-bottom">
 
-        <button id="exportarPDF">
-          📄 Exportar PDF
+        <button id="exportarSeleccionados">
+          📄 Exportar
         </button>
 
-        <div class="theme-switch">
+        <button id="borrarSeleccionados">
+          🗑 Eliminar
+        </button>
+
+        <div class="theme-box">
 
           <span>
             🌙 Tema Oscuro
@@ -101,8 +107,10 @@
 
           <label class="switch">
 
-            <input type="checkbox"
-                   id="themeToggle">
+            <input
+              type="checkbox"
+              id="themeToggle"
+            >
 
             <span class="slider"></span>
 
@@ -168,14 +176,6 @@
             </option>
 
           </select>
-
-          <button id="seleccionarTodo">
-            ✔ Seleccionar Todo
-          </button>
-
-          <button id="borrarSeleccionados">
-            🗑 Borrar
-          </button>
 
           <div class="fecha-actual"
                id="fechaActual">
