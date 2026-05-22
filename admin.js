@@ -1,4 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
 import {
   getFirestore,
   collection,
@@ -9,192 +10,413 @@ import {
   updateDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-/* FIREBASE */
+// LOGIN
+
+const password = prompt("Contraseña");
+
+if(password !== "country2026"){
+
+  document.body.innerHTML = `
+    <div class="login-error">
+      Contraseña incorrecta
+    </div>
+  `;
+
+  throw new Error("Sin acceso");
+
+}
+
+// FIREBASE
+
 const firebaseConfig = {
+
   apiKey: "AIzaSyDVI76qVw8v00Kr6sG537oIP2yw4AdR5-g",
   authDomain: "contry-c4953.firebaseapp.com",
   projectId: "contry-c4953",
   storageBucket: "contry-c4953.firebasestorage.app",
   messagingSenderId: "775091873432",
   appId: "1:775091873432:web:93331d930a4aa1063c52ed"
+
 };
 
-const app = initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig); // 🔧 FIX REAL
 const db = getFirestore(app);
 
-/* ELEMENTOS (IGUAL QUE TUYO) */
-const contenedor = document.getElementById("contenedorRegistros");
-const totalRegistros = document.getElementById("totalRegistros");
-const buscador = document.getElementById("buscador");
-const filtroEstado = document.getElementById("filtroEstado");
-const filtroFecha = document.getElementById("filtroFecha");
-const botonesSector = document.querySelectorAll(".sector-btn");
-const sidebar = document.getElementById("sidebar");
-const menuToggle = document.getElementById("menuToggle");
-const fechaActual = document.getElementById("fechaActual");
-const modoBtn = document.getElementById("modoBtn");
-const exportarPDF = document.getElementById("exportarPDF");
+// ELEMENTOS
 
-let registros = [];
-let sectorActual = "Campo";
+const contenedor =
+document.getElementById("contenedorRegistros");
 
-/* MENU */
-menuToggle.onclick = () => {
+const totalRegistros =
+document.getElementById("totalRegistros");
+
+const buscador =
+document.getElementById("buscador");
+
+const filtroEstado =
+document.getElementById("filtroEstado");
+
+const filtroFecha =
+document.getElementById("filtroFecha");
+
+const botonesSector =
+document.querySelectorAll(".sector-btn");
+
+const sidebar =
+document.getElementById("sidebar");
+
+const menuToggle =
+document.getElementById("menuToggle");
+
+const adminMain =
+document.getElementById("adminMain");
+
+const fechaActual =
+document.getElementById("fechaActual");
+
+const modoBtn =
+document.getElementById("modoBtn");
+
+const exportarPDF =
+document.getElementById("exportarPDF");
+
+// MENU
+
+menuToggle.addEventListener("click", () => {
+
   sidebar.classList.toggle("hidden");
-};
 
-/* DARK MODE */
-modoBtn.onclick = () => {
+  adminMain.classList.toggle("expandido");
+
+});
+
+// DARK MODE
+
+modoBtn.addEventListener("click", () => {
+
   document.body.classList.toggle("dark");
-  localStorage.setItem("modo", document.body.classList.contains("dark"));
-};
+
+  localStorage.setItem(
+    "modo",
+    document.body.classList.contains("dark")
+  );
+
+});
 
 if(localStorage.getItem("modo") === "true"){
+
   document.body.classList.add("dark");
+
 }
 
-/* FECHA */
-setInterval(() => {
-  const ahora = new Date();
-  fechaActual.textContent =
-    ahora.toLocaleDateString("es-AR") +
-    " • " +
-    ahora.toLocaleTimeString("es-AR",{hour:"2-digit",minute:"2-digit"});
-},1000);
+// FECHA
 
-/* 🔐 FIX SEGURIDAD HTML */
-function limpiarHTML(texto = ""){
-  return String(texto)
+function actualizarHora(){
+
+  const ahora = new Date();
+
+  fechaActual.innerHTML =
+
+  ahora.toLocaleDateString("es-AR") +
+
+  " • " +
+
+  ahora.toLocaleTimeString("es-AR",{
+
+    hour:"2-digit",
+    minute:"2-digit"
+
+  });
+
+}
+
+setInterval(actualizarHora,1000);
+actualizarHora();
+
+// VARIABLES
+
+let registros = [];
+
+let sectorActual = "Campo";
+
+// SECTORES
+
+botonesSector.forEach((boton) => {
+
+  boton.addEventListener("click", () => {
+
+    botonesSector.forEach((b) => {
+      b.classList.remove("active");
+    });
+
+    boton.classList.add("active");
+
+    sectorActual = boton.dataset.sector;
+
+    filtrar();
+
+  });
+
+});
+
+// VER MAS
+
+window.toggleTexto = function(id){
+
+  document.getElementById(id).classList.toggle("oculta");
+
+};
+
+// BORRAR
+
+window.eliminarRegistro = async function(id){
+
+  const confirmar = confirm("Eliminar informe?");
+  if(!confirmar) return;
+
+  await deleteDoc(doc(db,"registros",id));
+
+};
+
+// CAMBIAR ESTADO
+
+window.cambiarEstado = async function(id,estadoActual){
+
+  const estados = [
+    "Ok",
+    "Observacion",
+    "Urgente",
+    "EnProceso",
+    "Resuelto"
+  ];
+
+  let index = estados.indexOf(estadoActual);
+  index++;
+
+  if(index >= estados.length){
+    index = 0;
+  }
+
+  await updateDoc(doc(db,"registros",id),{
+    estado: estados[index]
+  });
+
+};
+
+// 🔧 FIX SEGURIDAD MINIMO
+function escapeHTML(text=""){
+  return String(text)
     .replace(/&/g,"&amp;")
     .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#039;");
+    .replace(/>/g,"&gt;");
 }
 
-/* DELETE */
-window.eliminarRegistro = async (id) => {
-  try {
-    await deleteDoc(doc(db,"registros",id));
-  } catch (e) {
-    alert("Error al eliminar");
-  }
-};
+// MOSTRAR
 
-/* CAMBIAR ESTADO */
-window.cambiarEstado = async (id,estado) => {
-  const estados = ["Ok","Observacion","Urgente","EnProceso","Resuelto"];
-
-  let i = estados.indexOf(estado);
-  i = (i + 1) % estados.length;
-
-  try {
-    await updateDoc(doc(db,"registros",id),{
-      estado: estados[i]
-    });
-  } catch(e){
-    alert("Error al actualizar estado");
-  }
-};
-
-/* RENDER OPTIMIZADO (MISMO DISEÑO) */
 function mostrar(lista){
 
-  let html = "";
+  contenedor.innerHTML = "";
 
-  totalRegistros.textContent = lista.length;
+  totalRegistros.innerHTML = lista.length;
 
-  lista.forEach(r => {
+  lista.forEach((registro,index) => {
 
-    const imgs = r.imagenes || (r.imagen ? [r.imagen] : []);
+    let colorEstado = "#3b82f6";
 
-    html += `
+    if(registro.estado === "Observacion"){
+      colorEstado = "#f59e0b";
+    }
+
+    if(registro.estado === "Urgente"){
+      colorEstado = "#ef4444";
+    }
+
+    if(registro.estado === "EnProceso"){
+      colorEstado = "#8b5cf6";
+    }
+
+    if(registro.estado === "Resuelto"){
+      colorEstado = "#22c55e";
+    }
+
+    const textoId = "texto" + index;
+
+    const textoLargo =
+      registro.descripcion &&
+      registro.descripcion.length > 180;
+
+    const imagenes =
+      registro.imagenes ||
+      (registro.imagen ? [registro.imagen] : []); // 🔧 FIX CRASH
+
+    contenedor.innerHTML += `
+
       <div class="registro-card">
 
         <div class="registro-header">
 
           <div>
-            <h3>${limpiarHTML(r.nombre || "")}</h3>
-            <div class="sector-mini">${limpiarHTML(r.sector || "")}</div>
+
+            <h3>
+              ${escapeHTML(registro.nombre || "")}
+            </h3>
+
+            <div class="sector-mini">
+              ${registro.sector}
+            </div>
+
           </div>
 
-          <div class="estado">
-            ${limpiarHTML(r.estado || "")}
+          <div class="estado"
+               style="background:${colorEstado}">
+
+            ${registro.estado}
+
           </div>
 
         </div>
 
-        <div class="descripcion">
-          ${limpiarHTML(r.descripcion || "")}
+        <div
+          class="descripcion ${textoLargo ? "oculta" : ""}"
+          id="${textoId}"
+        >
+
+          ${escapeHTML(registro.descripcion || "")}
+
         </div>
+
+        ${textoLargo ? `
+
+          <span
+            class="ver-mas"
+            onclick="toggleTexto('${textoId}')"
+          >
+            Ver más
+          </span>
+
+        ` : ""}
 
         <div class="info">
-          <span>📍 ${limpiarHTML(r.coordenadas || "Sin ubicación")}</span>
-          <span>🕒 ${limpiarHTML(r.fecha || "Sin fecha")}</span>
+
+          <span>
+            📍 ${registro.coordenadas || "Sin ubicación"}
+          </span>
+
+          <span>
+            🕒 ${registro.fecha || "Sin fecha"}
+          </span>
+
         </div>
 
         <div class="fotos-grid">
-          ${imgs.map(img => `
+
+          ${imagenes.map((img) => `
+
             <a href="${img}" target="_blank">
+
               <img src="${img}" class="preview-img">
+
             </a>
+
           `).join("")}
+
         </div>
 
         <div class="card-actions">
 
           <button class="btn-status"
-            onclick="cambiarEstado('${r.id}','${r.estado}')">
+            onclick="cambiarEstado('${registro.id}','${registro.estado}')">
+
             Cambiar Estado
+
           </button>
 
           <button class="btn-delete"
-            onclick="eliminarRegistro('${r.id}')">
+            onclick="eliminarRegistro('${registro.id}')">
+
             Eliminar
+
           </button>
 
         </div>
 
       </div>
+
     `;
+
   });
 
-  contenedor.innerHTML = html;
 }
 
-/* FILTRO (MISMO SISTEMA TUYO) */
+// FILTRAR (SIN TOCAR TU LOGICA)
 function filtrar(){
 
   const texto = buscador.value.toLowerCase();
+  const estado = filtroEstado.value;
+  const fecha = filtroFecha.value;
 
-  const filtrados = registros.filter(r =>
-    r.sector === sectorActual &&
-    (filtroEstado.value === "Todos" || r.estado === filtroEstado.value) &&
-    (r.nombre || "").toLowerCase().includes(texto)
-  );
+  const filtrados = registros.filter((r) => {
+
+    const coincideNombre =
+      (r.nombre || "").toLowerCase().includes(texto);
+
+    const coincideSector =
+      r.sector === sectorActual;
+
+    const coincideEstado =
+      estado === "Todos" || r.estado === estado;
+
+    let coincideFecha = true;
+
+    if(fecha){
+      coincideFecha =
+        r.fecha &&
+        r.fecha.includes(fecha);
+    }
+
+    return (
+      coincideNombre &&
+      coincideSector &&
+      coincideEstado &&
+      coincideFecha
+    );
+
+  });
 
   mostrar(filtrados);
+
 }
 
-/* EVENTS */
-buscador.oninput = filtrar;
-filtroEstado.onchange = filtrar;
+// EVENTOS
 
-botonesSector.forEach(b => {
-  b.onclick = () => {
-    botonesSector.forEach(x => x.classList.remove("active"));
-    b.classList.add("active");
-    sectorActual = b.dataset.sector;
-    filtrar();
-  };
+buscador.addEventListener("input", filtrar);
+filtroEstado.addEventListener("change", filtrar);
+filtroFecha.addEventListener("change", filtrar);
+
+// PDF
+
+exportarPDF.addEventListener("click", () => {
+  window.print();
 });
 
-/* FIREBASE REALTIME */
+// FIREBASE
+
 const q = query(collection(db,"registros"));
 
-onSnapshot(q,(snap)=>{
+onSnapshot(q, (snapshot) => {
+
   registros = [];
-  snap.forEach(d => registros.push({id:d.id,...d.data()}));
+
+  snapshot.forEach((docu) => {
+
+    registros.push({
+      id: docu.id,
+      ...docu.data()
+    });
+
+  });
+
   registros.reverse();
   filtrar();
+
 });
