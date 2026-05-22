@@ -2,198 +2,92 @@
 <html lang="es">
 
 <head>
-
-  <meta charset="UTF-8">
-
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0">
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Country Admin</title>
 
-  <link rel="stylesheet"
-        href="admin.css">
-
+  <link rel="stylesheet" href="admin.css"/>
 </head>
 
 <body>
 
-  <div class="background"></div>
+<div class="background"></div>
 
-  <!-- MENU -->
+<button id="menuToggle">☰</button>
 
-  <button id="menuToggle">
-    ☰
-  </button>
+<div class="admin-layout">
 
-  <div class="admin-layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
 
-    <!-- SIDEBAR -->
+    <div>
+      <h1>Country</h1>
+      <p>Panel de Supervisión</p>
+    </div>
 
-    <aside class="sidebar"
-           id="sidebar">
+    <div class="sidebar-box">
+      <span id="totalRegistros">0</span>
+      Informes Totales
+    </div>
 
-      <div>
+    <div class="sidebar-actions">
+      <button id="modoBtn">🌙 Modo Oscuro</button>
+      <button id="exportarPDF">📄 Exportar PDF</button>
+    </div>
 
-        <h1>
-          Country
-        </h1>
+    <div class="sectores">
 
-        <p>
-          Panel de Supervisión
-        </p>
+      <button class="sector-btn active" data-sector="Campo">🌱 Campo</button>
+      <button class="sector-btn" data-sector="Electricidad">⚡ Electricidad</button>
+      <button class="sector-btn" data-sector="Plomeria">🚰 Plomeria</button>
+      <button class="sector-btn" data-sector="Tecnica">🛠 Tecnica</button>
+      <button class="sector-btn" data-sector="Mantenimiento">🔧 Mantenimiento</button>
+      <button class="sector-btn" data-sector="Taller">🚗 Taller</button>
+
+    </div>
+
+  </aside>
+
+  <!-- MAIN -->
+  <main class="admin-main" id="adminMain">
+
+    <div class="top-panel">
+
+      <div class="top-info">
+        <h2>Informes</h2>
+        <p>Registros en tiempo real</p>
+      </div>
+
+      <div class="filtros">
+
+        <input type="text" id="buscador" placeholder="Buscar trabajador..."/>
+
+        <select id="filtroEstado">
+          <option value="Todos">Todos</option>
+          <option value="Ok">Ok</option>
+          <option value="Observacion">Observacion</option>
+          <option value="Urgente">Urgente</option>
+          <option value="EnProceso">En Proceso</option>
+          <option value="Resuelto">Resuelto</option>
+        </select>
+
+        <input type="date" id="filtroFecha"/>
+
+        <div class="fecha-actual" id="fechaActual"></div>
 
       </div>
 
-      <div class="sidebar-box">
+    </div>
 
-        <span id="totalRegistros">
-          0
-        </span>
+    <div id="contenedorRegistros">
+      <div class="loading">Cargando registros...</div>
+    </div>
 
-        Informes Totales
+  </main>
 
-      </div>
+</div>
 
-      <div class="sidebar-actions">
-
-        <button id="modoBtn">
-          🌙 Modo Oscuro
-        </button>
-
-        <button id="exportarPDF">
-          📄 Exportar PDF
-        </button>
-
-      </div>
-
-      <div class="sectores">
-
-        <button class="sector-btn active"
-                data-sector="Campo">
-
-          🌱 Campo
-
-        </button>
-
-        <button class="sector-btn"
-                data-sector="Electricidad">
-
-          ⚡ Electricidad
-
-        </button>
-
-        <button class="sector-btn"
-                data-sector="Plomeria">
-
-          🚰 Plomeria
-
-        </button>
-
-        <button class="sector-btn"
-                data-sector="Tecnica">
-
-          🛠 Tecnica
-
-        </button>
-
-        <button class="sector-btn"
-                data-sector="Mantenimiento">
-
-          🔧 Mantenimiento
-
-        </button>
-
-        <button class="sector-btn"
-                data-sector="Taller">
-
-          🚗 Taller
-
-        </button>
-
-      </div>
-
-    </aside>
-
-    <!-- MAIN -->
-
-    <main class="admin-main"
-          id="adminMain">
-
-      <div class="top-panel">
-
-        <div class="top-info">
-
-          <h2>
-            Informes
-          </h2>
-
-          <p>
-            Registros en tiempo real
-          </p>
-
-        </div>
-
-        <div class="filtros">
-
-          <input
-            type="text"
-            id="buscador"
-            placeholder="Buscar trabajador..."
-          >
-
-          <select id="filtroEstado">
-
-            <option value="Todos">
-              Todos
-            </option>
-
-            <option value="Ok">
-              Ok
-            </option>
-
-            <option value="Observacion">
-              Observacion
-            </option>
-
-            <option value="Urgente">
-              Urgente
-            </option>
-
-            <option value="EnProceso">
-              En Proceso
-            </option>
-
-            <option value="Resuelto">
-              Resuelto
-            </option>
-
-          </select>
-
-          <input
-            type="date"
-            id="filtroFecha"
-          >
-
-          <div class="fecha-actual"
-               id="fechaActual">
-
-          </div>
-
-        </div>
-
-      </div>
-
-      <div id="contenedorRegistros"></div>
-
-    </main>
-
-  </div>
-
-  <script type="module"
-          src="admin.js">
-
-  </script>
+<script type="module" src="admin.js"></script>
 
 </body>
-
 </html>
