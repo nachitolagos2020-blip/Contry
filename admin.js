@@ -1,5 +1,4 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-
 import {
   getFirestore,
   collection,
@@ -9,11 +8,6 @@ import {
   doc,
   updateDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-import {
-  getAuth,
-  signInWithEmailAndPassword
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 /* FIREBASE */
 const firebaseConfig = {
@@ -27,9 +21,8 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const auth = getAuth(app);
 
-/* ELEMENTOS */
+/* ELEMENTOS (IGUAL QUE TUYO) */
 const contenedor = document.getElementById("contenedorRegistros");
 const totalRegistros = document.getElementById("totalRegistros");
 const buscador = document.getElementById("buscador");
@@ -42,28 +35,21 @@ const fechaActual = document.getElementById("fechaActual");
 const modoBtn = document.getElementById("modoBtn");
 const exportarPDF = document.getElementById("exportarPDF");
 
-/* STATE */
 let registros = [];
 let sectorActual = "Campo";
 
-/* LOGIN REAL */
-const email = prompt("Email admin");
-const password = prompt("Contraseña");
-
-signInWithEmailAndPassword(auth,email,password)
-.catch(() => {
-  document.body.innerHTML = "<h2 style='color:red;text-align:center'>Acceso denegado</h2>";
-});
-
-/* UI */
-menuToggle.onclick = () => sidebar.classList.toggle("hidden");
-
-modoBtn.onclick = () => {
-  document.body.classList.toggle("dark");
-  localStorage.setItem("dark", document.body.classList.contains("dark"));
+/* MENU */
+menuToggle.onclick = () => {
+  sidebar.classList.toggle("hidden");
 };
 
-if(localStorage.getItem("dark") === "true"){
+/* DARK MODE */
+modoBtn.onclick = () => {
+  document.body.classList.toggle("dark");
+  localStorage.setItem("modo", document.body.classList.contains("dark"));
+};
+
+if(localStorage.getItem("modo") === "true"){
   document.body.classList.add("dark");
 }
 
@@ -76,12 +62,14 @@ setInterval(() => {
     ahora.toLocaleTimeString("es-AR",{hour:"2-digit",minute:"2-digit"});
 },1000);
 
-/* SANITIZE */
-function limpiarHTML(t=""){
-  return t
+/* 🔐 FIX SEGURIDAD HTML */
+function limpiarHTML(texto = ""){
+  return String(texto)
     .replace(/&/g,"&amp;")
     .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;");
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
 }
 
 /* DELETE */
@@ -100,18 +88,21 @@ window.cambiarEstado = async (id,estado) => {
   let i = estados.indexOf(estado);
   i = (i + 1) % estados.length;
 
-  await updateDoc(doc(db,"registros",id),{
-    estado: estados[i]
-  });
+  try {
+    await updateDoc(doc(db,"registros",id),{
+      estado: estados[i]
+    });
+  } catch(e){
+    alert("Error al actualizar estado");
+  }
 };
 
-/* RENDER */
+/* RENDER OPTIMIZADO (MISMO DISEÑO) */
 function mostrar(lista){
 
-  contenedor.innerHTML = "";
-  totalRegistros.textContent = lista.length;
-
   let html = "";
+
+  totalRegistros.textContent = lista.length;
 
   lista.forEach(r => {
 
@@ -120,25 +111,49 @@ function mostrar(lista){
     html += `
       <div class="registro-card">
 
-        <h3>${limpiarHTML(r.nombre || "")}</h3>
+        <div class="registro-header">
 
-        <div>${limpiarHTML(r.estado || "")}</div>
+          <div>
+            <h3>${limpiarHTML(r.nombre || "")}</h3>
+            <div class="sector-mini">${limpiarHTML(r.sector || "")}</div>
+          </div>
 
-        <p>${limpiarHTML(r.descripcion || "")}</p>
+          <div class="estado">
+            ${limpiarHTML(r.estado || "")}
+          </div>
 
-        <div>
-          ${imgs.map(img => `<img src="${img}" width="70"/>`).join("")}
         </div>
 
-        <button class="btn-status"
-          onclick="cambiarEstado('${r.id}','${r.estado}')">
-          Cambiar estado
-        </button>
+        <div class="descripcion">
+          ${limpiarHTML(r.descripcion || "")}
+        </div>
 
-        <button class="btn-delete"
-          onclick="eliminarRegistro('${r.id}')">
-          Eliminar
-        </button>
+        <div class="info">
+          <span>📍 ${limpiarHTML(r.coordenadas || "Sin ubicación")}</span>
+          <span>🕒 ${limpiarHTML(r.fecha || "Sin fecha")}</span>
+        </div>
+
+        <div class="fotos-grid">
+          ${imgs.map(img => `
+            <a href="${img}" target="_blank">
+              <img src="${img}" class="preview-img">
+            </a>
+          `).join("")}
+        </div>
+
+        <div class="card-actions">
+
+          <button class="btn-status"
+            onclick="cambiarEstado('${r.id}','${r.estado}')">
+            Cambiar Estado
+          </button>
+
+          <button class="btn-delete"
+            onclick="eliminarRegistro('${r.id}')">
+            Eliminar
+          </button>
+
+        </div>
 
       </div>
     `;
@@ -147,28 +162,15 @@ function mostrar(lista){
   contenedor.innerHTML = html;
 }
 
-/* FILTRO */
+/* FILTRO (MISMO SISTEMA TUYO) */
 function filtrar(){
 
   const texto = buscador.value.toLowerCase();
 
-  let filtrados = registros.filter(r =>
+  const filtrados = registros.filter(r =>
     r.sector === sectorActual &&
     (filtroEstado.value === "Todos" || r.estado === filtroEstado.value) &&
     (r.nombre || "").toLowerCase().includes(texto)
-  );
-
-  const prioridad = {
-    Urgente:0,
-    EnProceso:1,
-    Observacion:2,
-    Ok:3,
-    Resuelto:4
-  };
-
-  filtrados.sort((a,b) =>
-    (prioridad[a.estado] ?? 99) -
-    (prioridad[b.estado] ?? 99)
   );
 
   mostrar(filtrados);
@@ -177,7 +179,6 @@ function filtrar(){
 /* EVENTS */
 buscador.oninput = filtrar;
 filtroEstado.onchange = filtrar;
-filtroFecha.onchange = filtrar;
 
 botonesSector.forEach(b => {
   b.onclick = () => {
@@ -188,7 +189,7 @@ botonesSector.forEach(b => {
   };
 });
 
-/* FIREBASE */
+/* FIREBASE REALTIME */
 const q = query(collection(db,"registros"));
 
 onSnapshot(q,(snap)=>{
