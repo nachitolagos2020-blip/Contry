@@ -1,8 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+
 *{
   margin:0;
   padding:0;
   box-sizing:border-box;
-  font-family:Arial, Helvetica, sans-serif;
+  font-family:'Inter',sans-serif;
 }
 
 body{
@@ -10,14 +12,16 @@ body{
   min-height:100vh;
 
   background:
+
   linear-gradient(
     135deg,
-    #050505,
-    #0f0f0f,
-    #151515
+    #f5f5f4,
+    #e7e5e4,
+    #d6d3d1,
+    #fafaf9
   );
 
-  color:white;
+  color:#111827;
 
   overflow-x:hidden;
 
@@ -30,12 +34,14 @@ body{
   inset:0;
 
   background:
-  radial-gradient(circle at top left,#3b2a1f55,transparent 25%),
-  radial-gradient(circle at bottom right,#1f293755,transparent 25%);
+  radial-gradient(circle at top left,#3b2a1f22,transparent 25%),
+  radial-gradient(circle at bottom right,#11182711,transparent 25%);
 
   z-index:-1;
 
 }
+
+/* LAYOUT */
 
 .admin-layout{
 
@@ -52,14 +58,17 @@ body{
 .sidebar{
 
   background:
-  linear-gradient(
-    180deg,
-    #111111,
-    #181818
+
+  repeating-linear-gradient(
+    90deg,
+    #2b1810 0px,
+    #3a2418 40px,
+    #4a2f20 80px,
+    #2b1810 120px
   );
 
   border-right:
-  1px solid rgba(255,255,255,0.05);
+  1px solid rgba(0,0,0,0.15);
 
   padding:35px 25px;
 
@@ -69,19 +78,26 @@ body{
 
   justify-content:space-between;
 
+  box-shadow:
+  0 0 40px rgba(0,0,0,0.18);
+
 }
 
 .sidebar h1{
 
-  font-size:42px;
+  font-size:44px;
 
-  margin-bottom:10px;
+  font-weight:800;
+
+  color:white;
+
+  margin-bottom:8px;
 
 }
 
 .sidebar p{
 
-  color:#777;
+  color:#e7e5e4;
 
   margin-bottom:35px;
 
@@ -90,13 +106,11 @@ body{
 .sidebar-box{
 
   background:
-  linear-gradient(
-    145deg,
-    #2c1f17,
-    #3b2a1f
-  );
+  rgba(255,255,255,0.12);
 
-  border-radius:22px;
+  backdrop-filter:blur(12px);
+
+  border-radius:24px;
 
   padding:28px;
 
@@ -104,10 +118,10 @@ body{
 
   text-align:center;
 
-  color:#d6d3d1;
+  color:white;
 
   border:
-  1px solid rgba(255,255,255,0.05);
+  1px solid rgba(255,255,255,0.08);
 
 }
 
@@ -117,9 +131,7 @@ body{
 
   font-size:54px;
 
-  font-weight:bold;
-
-  color:white;
+  font-weight:800;
 
   margin-bottom:10px;
 
@@ -141,45 +153,45 @@ body{
 
   border:none;
 
-  background:#111111;
+  background:
+  rgba(255,255,255,0.15);
+
+  backdrop-filter:blur(10px);
 
   color:white;
 
   padding:18px;
 
-  border-radius:14px;
+  border-radius:16px;
 
   text-align:left;
 
   font-size:15px;
 
-  font-weight:bold;
+  font-weight:700;
 
   cursor:pointer;
 
   transition:0.25s;
 
   border:
-  1px solid rgba(255,255,255,0.05);
+  1px solid rgba(255,255,255,0.08);
 
 }
 
 .sector-btn:hover{
 
-  background:#1b1b1b;
+  transform:translateX(5px);
 
-  transform:translateX(4px);
+  background:
+  rgba(255,255,255,0.22);
 
 }
 
 .sector-btn.active{
 
   background:
-  linear-gradient(
-    145deg,
-    #2c1f17,
-    #4a3427
-  );
+  rgba(255,255,255,0.28);
 
 }
 
@@ -207,13 +219,15 @@ body{
 
 .admin-top h2{
 
-  font-size:48px;
+  font-size:52px;
+
+  font-weight:800;
 
 }
 
 .admin-top p{
 
-  color:#777;
+  color:#52525b;
 
   margin-top:8px;
 
@@ -234,22 +248,24 @@ body{
 #buscador,
 #filtroEstado{
 
-  background:#111111;
+  background:white;
 
-  color:white;
+  color:#111827;
 
   border:none;
 
   padding:16px;
 
-  border-radius:14px;
+  border-radius:16px;
 
   min-width:220px;
 
   font-size:15px;
 
-  border:
-  1px solid rgba(255,255,255,0.05);
+  font-weight:600;
+
+  box-shadow:
+  0 5px 20px rgba(0,0,0,0.06);
 
 }
 
@@ -257,9 +273,6 @@ body{
 #filtroEstado:focus{
 
   outline:none;
-
-  border:
-  1px solid #4a3427;
 
 }
 
@@ -281,24 +294,27 @@ body{
   background:
   linear-gradient(
     145deg,
-    #101010,
-    #161616
+    #ffffff,
+    #f5f5f4
   );
 
-  border-radius:24px;
+  border-radius:28px;
 
-  padding:22px;
+  padding:24px;
 
   border:
-  1px solid rgba(255,255,255,0.05);
+  1px solid rgba(0,0,0,0.06);
 
   transition:0.25s;
+
+  box-shadow:
+  0 10px 30px rgba(0,0,0,0.08);
 
 }
 
 .registro-card:hover{
 
-  transform:translateY(-3px);
+  transform:translateY(-4px);
 
 }
 
@@ -316,7 +332,9 @@ body{
 
 .registro-header h3{
 
-  font-size:24px;
+  font-size:25px;
+
+  font-weight:800;
 
   margin-bottom:6px;
 
@@ -324,9 +342,11 @@ body{
 
 .sector-mini{
 
-  color:#888;
+  color:#78716c;
 
   font-size:14px;
+
+  font-weight:600;
 
 }
 
@@ -338,7 +358,7 @@ body{
 
   font-size:13px;
 
-  font-weight:bold;
+  font-weight:700;
 
   color:white;
 
@@ -348,17 +368,19 @@ body{
 
 .descripcion{
 
-  background:#0b0b0b;
+  background:#f3f4f6;
 
-  border-radius:16px;
+  border-radius:18px;
 
   padding:18px;
 
-  line-height:1.6;
+  line-height:1.7;
 
-  color:#ddd;
+  color:#111827;
 
   margin-bottom:18px;
+
+  font-weight:600;
 
 }
 
@@ -370,33 +392,79 @@ body{
 
   gap:10px;
 
-  color:#888;
+  color:#57534e;
 
   font-size:14px;
 
-  margin-bottom:18px;
+  font-weight:600;
+
+  margin-bottom:20px;
+
+}
+
+/* FOTO */
+
+.foto-box{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:16px;
 
 }
 
 .preview-img{
 
-  width:100%;
+  width:90px;
 
-  height:220px;
+  height:90px;
 
   object-fit:cover;
 
-  border-radius:18px;
+  border-radius:16px;
 
   cursor:pointer;
 
   transition:0.3s;
 
+  border:
+  2px solid rgba(0,0,0,0.08);
+
 }
 
 .preview-img:hover{
 
-  transform:scale(1.02);
+  transform:scale(1.05);
+
+}
+
+.ver-foto{
+
+  background:
+  linear-gradient(
+    145deg,
+    #111827,
+    #1f2937
+  );
+
+  color:white;
+
+  padding:12px 18px;
+
+  border-radius:14px;
+
+  text-decoration:none;
+
+  font-weight:700;
+
+  transition:0.25s;
+
+}
+
+.ver-foto:hover{
+
+  transform:translateY(-2px);
 
 }
 
@@ -413,6 +481,8 @@ body{
   align-items:center;
 
   font-size:42px;
+
+  font-weight:800;
 
 }
 
@@ -446,7 +516,7 @@ body{
 
   .admin-top h2{
 
-    font-size:38px;
+    font-size:40px;
 
   }
 
