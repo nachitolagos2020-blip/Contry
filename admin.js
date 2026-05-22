@@ -123,6 +123,13 @@ setInterval(actualizarHora,1000);
 
 actualizarHora();
 
+// FECHA AUTOMATICA
+
+const hoy =
+  new Date().toISOString().split("T")[0];
+
+filtroFecha.value = hoy;
+
 // VARIABLES
 
 let registros = [];
@@ -356,40 +363,6 @@ buscador.addEventListener("input", filtrar);
 filtroEstado.addEventListener("change", filtrar);
 
 filtroFecha.addEventListener("change", filtrar);
-
-// FECHAS
-
-function generarFechas(){
-
-  const hoy =
-    new Date();
-
-  const fin =
-    new Date("2026-12-31");
-
-  while(hoy <= fin){
-
-    const fecha =
-
-      hoy.toISOString().split("T")[0];
-
-    filtroFecha.innerHTML += `
-
-      <option value="${fecha}">
-        ${fecha}
-      </option>
-
-    `;
-
-    hoy.setDate(
-      hoy.getDate() + 1
-    );
-
-  }
-
-}
-
-generarFechas();
 
 // FIREBASE
 
