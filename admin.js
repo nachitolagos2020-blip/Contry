@@ -85,6 +85,9 @@ const menuToggle =
 const adminMain =
   document.getElementById("adminMain");
 
+const fechaActual =
+  document.getElementById("fechaActual");
+
 // MENU
 
 menuToggle.addEventListener("click", () => {
@@ -94,6 +97,31 @@ menuToggle.addEventListener("click", () => {
   adminMain.classList.toggle("expandido");
 
 });
+
+// FECHA Y HORA
+
+function actualizarHora(){
+
+  const ahora = new Date();
+
+  fechaActual.innerHTML =
+
+    ahora.toLocaleDateString("es-AR") +
+
+    " • " +
+
+    ahora.toLocaleTimeString("es-AR",{
+
+      hour:"2-digit",
+      minute:"2-digit"
+
+    });
+
+}
+
+setInterval(actualizarHora,1000);
+
+actualizarHora();
 
 // VARIABLES
 
@@ -124,26 +152,19 @@ botonesSector.forEach((boton) => {
 
 });
 
-// FORMATEAR FECHA
+// EXPANDIR TEXTO
 
-function formatearFecha(fecha){
-
-  if(!fecha) return "Sin fecha";
-
-  const date = new Date(fecha);
-
-  return date.toLocaleString("es-AR");
-
-}
-
-// TOGGLE TEXTO
-
-window.toggleTexto = function(id){
+window.toggleTexto = function(textoId,cardId){
 
   const texto =
-    document.getElementById(id);
+    document.getElementById(textoId);
+
+  const card =
+    document.getElementById(cardId);
 
   texto.classList.toggle("oculta");
+
+  card.classList.toggle("expandido");
 
 };
 
@@ -171,9 +192,17 @@ function mostrar(lista){
     const textoId =
       "texto" + index;
 
+    const cardId =
+      "card" + index;
+
+    const textoLargo =
+      registro.descripcion &&
+      registro.descripcion.length > 180;
+
     contenedor.innerHTML += `
 
-      <div class="registro-card">
+      <div class="registro-card"
+           id="${cardId}">
 
         <div class="registro-header">
 
@@ -199,7 +228,7 @@ function mostrar(lista){
         </div>
 
         <div
-          class="descripcion oculta"
+          class="descripcion ${textoLargo ? "oculta" : ""}"
           id="${textoId}"
         >
 
@@ -207,14 +236,18 @@ function mostrar(lista){
 
         </div>
 
-        <span
-          class="ver-mas"
-          onclick="toggleTexto('${textoId}')"
-        >
+        ${textoLargo ? `
 
-          Ver más...
+          <span
+            class="ver-mas"
+            onclick="toggleTexto('${textoId}','${cardId}')"
+          >
 
-        </span>
+            Ver más
+
+          </span>
+
+        ` : ""}
 
         <div class="info">
 
@@ -223,7 +256,7 @@ function mostrar(lista){
           </span>
 
           <span>
-            🕒 ${formatearFecha(registro.fecha)}
+            🕒 ${registro.fecha}
           </span>
 
         </div>
@@ -323,6 +356,40 @@ buscador.addEventListener("input", filtrar);
 filtroEstado.addEventListener("change", filtrar);
 
 filtroFecha.addEventListener("change", filtrar);
+
+// FECHAS
+
+function generarFechas(){
+
+  const hoy =
+    new Date();
+
+  const fin =
+    new Date("2026-12-31");
+
+  while(hoy <= fin){
+
+    const fecha =
+
+      hoy.toISOString().split("T")[0];
+
+    filtroFecha.innerHTML += `
+
+      <option value="${fecha}">
+        ${fecha}
+      </option>
+
+    `;
+
+    hoy.setDate(
+      hoy.getDate() + 1
+    );
+
+  }
+
+}
+
+generarFechas();
 
 // FIREBASE
 
