@@ -246,7 +246,7 @@ body{
 
   flex:1;
 
-  padding:18px;
+  padding:14px;
 
   transition:0.35s;
 
@@ -266,13 +266,14 @@ body{
 
   linear-gradient(
     145deg,
-    #ffffff,
-    #f1f1f1
+    #1f1f1f,
+    #262626,
+    #202020
   );
 
   border-radius:24px;
 
-  padding:18px;
+  padding:16px 18px;
 
   display:flex;
 
@@ -285,7 +286,7 @@ body{
   margin-bottom:18px;
 
   box-shadow:
-  0 6px 20px rgba(0,0,0,0.04);
+  0 6px 20px rgba(0,0,0,0.12);
 
 }
 
@@ -309,11 +310,13 @@ body{
 
   font-weight:800;
 
+  color:white;
+
 }
 
 .top-panel p{
 
-  color:#71717a;
+  color:#cfcfcf;
 
   margin-top:5px;
 
@@ -325,6 +328,8 @@ body{
 
   display:flex;
 
+  align-items:center;
+
   gap:10px;
 
   flex-wrap:wrap;
@@ -335,7 +340,9 @@ body{
 #filtroEstado,
 #filtroFecha{
 
-  background:white;
+  background:#2b2b2b;
+
+  color:white;
 
   border:none;
 
@@ -343,14 +350,27 @@ body{
 
   border-radius:14px;
 
-  min-width:180px;
+  min-width:170px;
 
   font-size:14px;
 
   font-weight:700;
 
-  border:
-  1px solid rgba(0,0,0,0.06);
+}
+
+.fecha-actual{
+
+  background:#2b2b2b;
+
+  color:white;
+
+  padding:14px 18px;
+
+  border-radius:14px;
+
+  font-size:14px;
+
+  font-weight:700;
 
 }
 
@@ -388,6 +408,14 @@ body{
 
   box-shadow:
   0 5px 18px rgba(0,0,0,0.05);
+
+  transition:0.3s;
+
+}
+
+.registro-card.expandido{
+
+  grid-column:span 2;
 
 }
 
@@ -481,15 +509,33 @@ body{
 
   margin-top:10px;
 
-  display:inline-block;
+  display:inline-flex;
 
-  color:#2563eb;
+  align-items:center;
+
+  justify-content:center;
+
+  background:#1f1f1f;
+
+  color:white;
+
+  padding:10px 14px;
+
+  border-radius:12px;
 
   font-weight:700;
 
   cursor:pointer;
 
   font-size:13px;
+
+  transition:0.25s;
+
+}
+
+.ver-mas:hover{
+
+  background:#111111;
 
 }
 
@@ -562,6 +608,16 @@ body{
 }
 
 /* RESPONSIVE */
+
+@media(max-width:900px){
+
+  .registro-card.expandido{
+
+    grid-column:span 1;
+
+  }
+
+}
 
 @media(max-width:700px){
 
