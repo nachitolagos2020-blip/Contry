@@ -7,10 +7,7 @@ import {
   getFirestore,
   collection,
   onSnapshot,
-  query,
-  deleteDoc,
-  doc,
-  updateDoc
+  query
 
 }
 
@@ -36,12 +33,9 @@ if(password !== "country2026"){
 
 const firebaseConfig = {
 
-  apiKey: "AIzaSyDVI76qVw8v00Kr6sG537oIP2yw4AdR5-g",
-  authDomain: "contry-c4953.firebaseapp.com",
-  projectId: "contry-c4953",
-  storageBucket: "contry-c4953.firebasestorage.app",
-  messagingSenderId: "775091873432",
-  appId: "1:775091873432:web:93331d930a4aa1063c52ed"
+  apiKey: "TU_API",
+  authDomain: "TU_DOMAIN",
+  projectId: "TU_PROJECT"
 
 };
 
@@ -69,54 +63,42 @@ document.getElementById("filtroFecha");
 const botonesSector =
 document.querySelectorAll(".sector-btn");
 
-const sidebar =
-document.getElementById("sidebar");
+const fechaActual =
+document.getElementById("fechaActual");
 
 const menuToggle =
 document.getElementById("menuToggle");
 
+const sidebar =
+document.getElementById("sidebar");
+
 const adminMain =
 document.getElementById("adminMain");
 
-const fechaActual =
-document.getElementById("fechaActual");
+const themeToggle =
+document.getElementById("themeToggle");
 
-const modoBtn =
-document.getElementById("modoBtn");
+let registros = [];
 
-const exportarPDF =
-document.getElementById("exportarPDF");
+let sectorActual = "Campo";
 
 // MENU
 
-menuToggle.addEventListener("click", () => {
+menuToggle.addEventListener("click",()=>{
 
   sidebar.classList.toggle("hidden");
 
-  adminMain.classList.toggle("expandido");
-
 });
 
-// DARK MODE
+// TEMA
 
-modoBtn.addEventListener("click", () => {
+themeToggle.addEventListener("change",()=>{
 
   document.body.classList.toggle("dark");
 
-  localStorage.setItem(
-    "modo",
-    document.body.classList.contains("dark")
-  );
-
 });
 
-if(localStorage.getItem("modo") === "true"){
-
-  document.body.classList.add("dark");
-
-}
-
-// FECHA
+// HORA
 
 function actualizarHora(){
 
@@ -141,19 +123,13 @@ setInterval(actualizarHora,1000);
 
 actualizarHora();
 
-// VARIABLES
-
-let registros = [];
-
-let sectorActual = "Campo";
-
 // SECTORES
 
-botonesSector.forEach((boton) => {
+botonesSector.forEach((boton)=>{
 
-  boton.addEventListener("click", () => {
+  boton.addEventListener("click",()=>{
 
-    botonesSector.forEach((b) => {
+    botonesSector.forEach((b)=>{
 
       b.classList.remove("active");
 
@@ -170,67 +146,6 @@ botonesSector.forEach((boton) => {
 
 });
 
-// VER MAS
-
-window.toggleTexto = function(id){
-
-  document
-  .getElementById(id)
-  .classList
-  .toggle("oculta");
-
-};
-
-// BORRAR
-
-window.eliminarRegistro = async function(id){
-
-  const confirmar =
-  confirm("Eliminar informe?");
-
-  if(!confirmar) return;
-
-  await deleteDoc(
-    doc(db,"registros",id)
-  );
-
-};
-
-// CAMBIAR ESTADO
-
-window.cambiarEstado = async function(id,estadoActual){
-
-  const estados = [
-
-    "Ok",
-    "Observacion",
-    "Urgente",
-    "EnProceso",
-    "Resuelto"
-
-  ];
-
-  let index =
-  estados.indexOf(estadoActual);
-
-  index++;
-
-  if(index >= estados.length){
-    index = 0;
-  }
-
-  await updateDoc(
-
-    doc(db,"registros",id),
-
-    {
-      estado: estados[index]
-    }
-
-  );
-
-};
-
 // MOSTRAR
 
 function mostrar(lista){
@@ -240,36 +155,30 @@ function mostrar(lista){
   totalRegistros.innerHTML =
   lista.length;
 
-  lista.forEach((registro,index) => {
+  lista.forEach((registro,index)=>{
 
-    let colorEstado = "#3b82f6";
-
-    if(registro.estado === "Observacion"){
-      colorEstado = "#f59e0b";
-    }
+    let colorEstado = "#22c55e";
 
     if(registro.estado === "Urgente"){
       colorEstado = "#ef4444";
     }
 
-    if(registro.estado === "EnProceso"){
-      colorEstado = "#8b5cf6";
+    if(registro.estado === "En Proceso"){
+      colorEstado = "#9333ea";
     }
 
     if(registro.estado === "Resuelto"){
       colorEstado = "#22c55e";
     }
 
-    const textoId =
-    "texto" + index;
-
-    const textoLargo =
-    registro.descripcion &&
-    registro.descripcion.length > 180;
-
     contenedor.innerHTML += `
 
       <div class="registro-card">
+
+        <input
+          type="checkbox"
+          class="checkbox-select"
+        >
 
         <div class="registro-header">
 
@@ -285,8 +194,10 @@ function mostrar(lista){
 
           </div>
 
-          <div class="estado"
-               style="background:${colorEstado}">
+          <div
+            class="estado"
+            style="background:${colorEstado}"
+          >
 
             ${registro.estado}
 
@@ -294,79 +205,32 @@ function mostrar(lista){
 
         </div>
 
-        <div
-          class="descripcion ${textoLargo ? "oculta" : ""}"
-          id="${textoId}"
-        >
+        <div class="descripcion">
 
           ${registro.descripcion}
 
         </div>
 
-        ${textoLargo ? `
-
-          <span
-            class="ver-mas"
-            onclick="toggleTexto('${textoId}')"
-          >
-
-            Ver más
-
-          </span>
-
-        ` : ""}
-
         <div class="info">
 
           <span>
-            📍 ${registro.coordenadas || "Sin ubicación"}
+            📍 ${registro.coordenadas}
           </span>
 
           <span>
-            🕒 ${registro.fecha || "Sin fecha"}
+            🕒 ${registro.fecha}
           </span>
 
         </div>
 
-        <div class="fotos-grid">
+        ${registro.imagen ? `
 
-          ${(registro.imagenes || [registro.imagen]).map((img) => `
-
-            <a href="${img}"
-               target="_blank">
-
-              <img
-                src="${img}"
-                class="preview-img"
-              >
-
-            </a>
-
-          `).join("")}
-
-        </div>
-
-        <div class="card-actions">
-
-          <button
-            class="btn-status"
-            onclick="cambiarEstado('${registro.id}','${registro.estado}')"
+          <img
+            src="${registro.imagen}"
+            class="preview-img"
           >
 
-            Cambiar Estado
-
-          </button>
-
-          <button
-            class="btn-delete"
-            onclick="eliminarRegistro('${registro.id}')"
-          >
-
-            Eliminar
-
-          </button>
-
-        </div>
+        ` : ""}
 
       </div>
 
@@ -389,8 +253,7 @@ function filtrar(){
   const fecha =
   filtroFecha.value;
 
-  const filtrados =
-  registros.filter((r) => {
+  const filtrados = registros.filter((r)=>{
 
     const coincideNombre =
 
@@ -434,40 +297,57 @@ function filtrar(){
 
 // EVENTOS
 
-buscador.addEventListener("input", filtrar);
+buscador.addEventListener("input",filtrar);
 
-filtroEstado.addEventListener("change", filtrar);
+filtroEstado.addEventListener("change",filtrar);
 
-filtroFecha.addEventListener("change", filtrar);
+filtroFecha.addEventListener("change",filtrar);
 
-// PDF
+// FECHAS
 
-exportarPDF.addEventListener("click", () => {
+function generarFechas(){
 
-  window.print();
+  const hoy = new Date();
 
-});
+  const fin = new Date("2026-12-31");
+
+  while(hoy <= fin){
+
+    const fecha =
+
+    hoy.toISOString().split("T")[0];
+
+    filtroFecha.innerHTML += `
+
+      <option value="${fecha}">
+        ${fecha}
+      </option>
+
+    `;
+
+    hoy.setDate(
+      hoy.getDate() + 1
+    );
+
+  }
+
+}
+
+generarFechas();
 
 // FIREBASE
 
 const q = query(
-
   collection(db,"registros")
-
 );
 
-onSnapshot(q, (snapshot) => {
+onSnapshot(q,(snapshot)=>{
 
   registros = [];
 
-  snapshot.forEach((docu) => {
+  snapshot.forEach((doc)=>{
 
-    registros.push({
-
-      id: docu.id,
-      ...docu.data()
-
-    });
+    registros.push(doc.data());
 
   });
 
