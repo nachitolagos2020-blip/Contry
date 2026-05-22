@@ -19,11 +19,15 @@
 
   <div class="background"></div>
 
+  <!-- MENU -->
+
   <button id="menuToggle">
     ☰
   </button>
 
   <div class="admin-layout">
+
+    <!-- SIDEBAR -->
 
     <aside class="sidebar"
            id="sidebar">
@@ -110,6 +114,8 @@
 
     </aside>
 
+    <!-- MAIN -->
+
     <main class="admin-main"
           id="adminMain">
 
@@ -129,26 +135,49 @@
 
         <div class="filtros">
 
-          <input type="text"
-                 id="buscador"
-                 placeholder="Buscar trabajador...">
+          <input
+            type="text"
+            id="buscador"
+            placeholder="Buscar trabajador..."
+          >
 
           <select id="filtroEstado">
 
-            <option value="Todos">Todos</option>
-            <option value="Ok">Ok</option>
-            <option value="Observacion">Observacion</option>
-            <option value="Urgente">Urgente</option>
-            <option value="EnProceso">En Proceso</option>
-            <option value="Resuelto">Resuelto</option>
+            <option value="Todos">
+              Todos
+            </option>
+
+            <option value="Ok">
+              Ok
+            </option>
+
+            <option value="Observacion">
+              Observacion
+            </option>
+
+            <option value="Urgente">
+              Urgente
+            </option>
+
+            <option value="EnProceso">
+              En Proceso
+            </option>
+
+            <option value="Resuelto">
+              Resuelto
+            </option>
 
           </select>
 
-          <input type="date"
-                 id="filtroFecha">
+          <input
+            type="date"
+            id="filtroFecha"
+          >
 
           <div class="fecha-actual"
-               id="fechaActual"></div>
+               id="fechaActual">
+
+          </div>
 
         </div>
 
@@ -161,8 +190,9 @@
   </div>
 
   <script type="module"
-          src="admin.js"></script>
+          src="admin.js">
+
+  </script>
 
 </body>
-
 </html>
