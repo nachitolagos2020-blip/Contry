@@ -7,8 +7,7 @@ import {
   getFirestore,
   collection,
   onSnapshot,
-  query,
-  orderBy
+  query
 
 }
 
@@ -62,14 +61,11 @@ const db = getFirestore(app);
 const contenedor =
   document.getElementById("contenedorRegistros");
 
-const buscador =
-  document.getElementById("buscador");
-
 const totalRegistros =
   document.getElementById("totalRegistros");
 
-const botonesSector =
-  document.querySelectorAll(".sector-btn");
+const buscador =
+  document.getElementById("buscador");
 
 const filtroEstado =
   document.getElementById("filtroEstado");
@@ -77,45 +73,49 @@ const filtroEstado =
 const filtroFecha =
   document.getElementById("filtroFecha");
 
-const horaActual =
-  document.getElementById("horaActual");
+const botonesSector =
+  document.querySelectorAll(".sector-btn");
 
-const layout =
-  document.getElementById("layout");
+const sidebar =
+  document.getElementById("sidebar");
 
-const toggleMenu =
-  document.getElementById("toggleMenu");
+const menuToggle =
+  document.getElementById("menuToggle");
 
-// FECHA AUTOMÁTICA
+const adminMain =
+  document.getElementById("adminMain");
 
-const hoy = new Date();
+const fechaActual =
+  document.getElementById("fechaActual");
 
-const año = hoy.getFullYear();
+// MENU
 
-const mes =
-  String(hoy.getMonth() + 1)
-  .padStart(2,"0");
+menuToggle.addEventListener("click", () => {
 
-const dia =
-  String(hoy.getDate())
-  .padStart(2,"0");
+  sidebar.classList.toggle("hidden");
 
-filtroFecha.value =
-  `${año}-${mes}-${dia}`;
+  adminMain.classList.toggle("expandido");
 
-// HORA
+});
+
+// FECHA Y HORA
 
 function actualizarHora(){
 
   const ahora = new Date();
 
-  horaActual.innerHTML =
+  fechaActual.innerHTML =
 
-    ahora.toLocaleDateString() +
+    ahora.toLocaleDateString("es-AR") +
 
     " • " +
 
-    ahora.toLocaleTimeString();
+    ahora.toLocaleTimeString("es-AR",{
+
+      hour:"2-digit",
+      minute:"2-digit"
+
+    });
 
 }
 
@@ -123,44 +123,54 @@ setInterval(actualizarHora,1000);
 
 actualizarHora();
 
-// MENU
-
-toggleMenu.addEventListener("click", () => {
-
-  layout.classList.toggle("minimized");
-
-});
-
 // VARIABLES
+
+let registros = [];
 
 let sectorActual = "Campo";
 
-let todosLosRegistros = [];
-
-// BOTONES
+// SECTORES
 
 botonesSector.forEach((boton) => {
 
   boton.addEventListener("click", () => {
 
-    botonesSector.forEach((b) =>
-      b.classList.remove("active")
-    );
+    botonesSector.forEach((b) => {
+
+      b.classList.remove("active");
+
+    });
 
     boton.classList.add("active");
 
     sectorActual =
       boton.dataset.sector;
 
-    filtrarRegistros();
+    filtrar();
 
   });
 
 });
 
+// EXPANDIR TEXTO
+
+window.toggleTexto = function(textoId,cardId){
+
+  const texto =
+    document.getElementById(textoId);
+
+  const card =
+    document.getElementById(cardId);
+
+  texto.classList.toggle("oculta");
+
+  card.classList.toggle("expandido");
+
+};
+
 // MOSTRAR
 
-function mostrarRegistros(lista){
+function mostrar(lista){
 
   contenedor.innerHTML = "";
 
@@ -169,25 +179,30 @@ function mostrarRegistros(lista){
 
   lista.forEach((registro,index) => {
 
-    let colorEstado = "#2563eb";
+    let colorEstado = "#3b82f6";
 
     if(registro.estado === "Observacion"){
-      colorEstado = "#eab308";
+      colorEstado = "#f59e0b";
     }
 
     if(registro.estado === "Urgente"){
       colorEstado = "#ef4444";
     }
 
-    const textoLargo =
-      registro.descripcion.length > 180;
+    const textoId =
+      "texto" + index;
 
-    const textoCorto =
-      registro.descripcion.substring(0,180);
+    const cardId =
+      "card" + index;
+
+    const textoLargo =
+      registro.descripcion &&
+      registro.descripcion.length > 180;
 
     contenedor.innerHTML += `
 
-      <div class="registro-card">
+      <div class="registro-card"
+           id="${cardId}">
 
         <div class="registro-header">
 
@@ -203,41 +218,36 @@ function mostrarRegistros(lista){
 
           </div>
 
-          <span
-            class="estado"
-            style="background:${colorEstado}"
-          >
+          <div class="estado"
+               style="background:${colorEstado}">
 
             ${registro.estado}
 
-          </span>
+          </div>
 
         </div>
 
         <div
-          class="descripcion"
-          id="desc-${index}"
+          class="descripcion ${textoLargo ? "oculta" : ""}"
+          id="${textoId}"
         >
 
-          ${textoLargo ? textoCorto + "..." : registro.descripcion}
-
-          ${textoLargo ? `
-
-            <button
-              class="ver-mas"
-              onclick="toggleTexto(${index},
-              \`${registro.descripcion}\`,
-              \`${textoCorto}\`)"
-
-            >
-
-              Ver más
-
-            </button>
-
-          ` : ""}
+          ${registro.descripcion}
 
         </div>
+
+        ${textoLargo ? `
+
+          <span
+            class="ver-mas"
+            onclick="toggleTexto('${textoId}','${cardId}')"
+          >
+
+            Ver más
+
+          </span>
+
+        ` : ""}
 
         <div class="info">
 
@@ -253,20 +263,24 @@ function mostrarRegistros(lista){
 
         ${registro.imagen ? `
 
-          <button
-            class="foto-btn"
-            onclick="toggleImagen(${index})"
-          >
+          <div class="foto-box">
 
-            Ver Foto
+            <img
+              src="${registro.imagen}"
+              class="preview-img"
+            >
 
-          </button>
+            <a
+              href="${registro.imagen}"
+              target="_blank"
+              class="ver-foto"
+            >
 
-          <img
-            src="${registro.imagen}"
-            class="preview-img"
-            id="img-${index}"
-          >
+              Ver Imagen
+
+            </a>
+
+          </div>
 
         ` : ""}
 
@@ -278,112 +292,52 @@ function mostrarRegistros(lista){
 
 }
 
-// TOGGLE FOTO
-
-window.toggleImagen = (id) => {
-
-  document
-    .getElementById(`img-${id}`)
-    .classList.toggle("active");
-
-};
-
-// TOGGLE TEXTO
-
-window.toggleTexto = (id,texto,corto) => {
-
-  const box =
-    document.getElementById(`desc-${id}`);
-
-  if(box.classList.contains("expandido")){
-
-    box.classList.remove("expandido");
-
-    box.innerHTML = `
-
-      ${corto}...
-
-      <button
-        class="ver-mas"
-        onclick="toggleTexto(${id},
-        \`${texto}\`,
-        \`${corto}\`)"
-
-      >
-
-        Ver más
-
-      </button>
-
-    `;
-
-  }else{
-
-    box.classList.add("expandido");
-
-    box.innerHTML = `
-
-      ${texto}
-
-      <button
-        class="ver-mas"
-        onclick="toggleTexto(${id},
-        \`${texto}\`,
-        \`${corto}\`)"
-
-      >
-
-        Ver menos
-
-      </button>
-
-    `;
-
-  }
-
-};
-
 // FILTRAR
 
-function filtrarRegistros(){
+function filtrar(){
 
-  const valor =
+  const texto =
     buscador.value.toLowerCase();
 
-  const estadoFiltro =
+  const estado =
     filtroEstado.value;
 
-  const fechaFiltro =
+  const fecha =
     filtroFecha.value;
 
   const filtrados =
-    todosLosRegistros.filter((r) => {
+    registros.filter((r) => {
+
+      const coincideNombre =
+
+        r.nombre
+        .toLowerCase()
+        .includes(texto);
 
       const coincideSector =
-        r.sector === sectorActual;
 
-      const coincideBusqueda =
-        r.nombre.toLowerCase()
-        .includes(valor);
+        r.sector === sectorActual;
 
       const coincideEstado =
 
-        estadoFiltro === "" ||
+        estado === "Todos" ||
 
-        r.estado === estadoFiltro;
+        r.estado === estado;
 
-      const coincideFecha =
+      let coincideFecha = true;
 
-        fechaFiltro === "" ||
+      if(fecha){
 
-        r.fecha.includes(
-          fechaFiltro.split("-").reverse().join("/")
-        );
+        coincideFecha =
+          r.fecha &&
+          r.fecha.includes(fecha);
 
-      return(
+      }
 
+      return (
+
+        coincideNombre &&
         coincideSector &&
-        coincideBusqueda &&
         coincideEstado &&
         coincideFecha
 
@@ -391,38 +345,72 @@ function filtrarRegistros(){
 
     });
 
-  mostrarRegistros(filtrados);
+  mostrar(filtrados);
 
 }
 
 // EVENTOS
 
-buscador.addEventListener("input",filtrarRegistros);
+buscador.addEventListener("input", filtrar);
 
-filtroEstado.addEventListener("change",filtrarRegistros);
+filtroEstado.addEventListener("change", filtrar);
 
-filtroFecha.addEventListener("change",filtrarRegistros);
+filtroFecha.addEventListener("change", filtrar);
+
+// FECHAS
+
+function generarFechas(){
+
+  const hoy =
+    new Date();
+
+  const fin =
+    new Date("2026-12-31");
+
+  while(hoy <= fin){
+
+    const fecha =
+
+      hoy.toISOString().split("T")[0];
+
+    filtroFecha.innerHTML += `
+
+      <option value="${fecha}">
+        ${fecha}
+      </option>
+
+    `;
+
+    hoy.setDate(
+      hoy.getDate() + 1
+    );
+
+  }
+
+}
+
+generarFechas();
 
 // FIREBASE
 
 const q = query(
 
-  collection(db,"registros"),
-
-  orderBy("fecha","desc")
+  collection(db, "registros")
 
 );
 
-onSnapshot(q,(snapshot) => {
+onSnapshot(q, (snapshot) => {
 
-  todosLosRegistros = [];
+  registros = [];
 
   snapshot.forEach((doc) => {
 
-    todosLosRegistros.push(doc.data());
+    registros.push(doc.data());
 
   });
 
-  filtrarRegistros();
+  registros.reverse();
+
+  filtrar();
 
 });
