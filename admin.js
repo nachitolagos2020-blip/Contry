@@ -7,7 +7,10 @@ import {
   getFirestore,
   collection,
   onSnapshot,
-  query
+  query,
+  deleteDoc,
+  doc,
+  updateDoc
 
 }
 
@@ -15,8 +18,7 @@ from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 // LOGIN
 
-const password =
-  prompt("Contraseña");
+const password = prompt("Contraseña");
 
 if(password !== "country2026"){
 
@@ -34,9 +36,12 @@ if(password !== "country2026"){
 
 const firebaseConfig = {
 
-  apiKey: "TU_API_KEY",
-  authDomain: "TU_DOMAIN",
-  projectId: "TU_PROJECT_ID"
+  apiKey: "AIzaSyDVI76qVw8v00Kr6sG537oIP2yw4AdR5-g",
+  authDomain: "contry-c4953.firebaseapp.com",
+  projectId: "contry-c4953",
+  storageBucket: "contry-c4953.firebasestorage.app",
+  messagingSenderId: "775091873432",
+  appId: "1:775091873432:web:93331d930a4aa1063c52ed"
 
 };
 
@@ -70,41 +75,46 @@ document.getElementById("sidebar");
 const menuToggle =
 document.getElementById("menuToggle");
 
+const adminMain =
+document.getElementById("adminMain");
+
 const fechaActual =
 document.getElementById("fechaActual");
 
-const exportarSeleccionados =
-document.getElementById("exportarSeleccionados");
+const modoBtn =
+document.getElementById("modoBtn");
 
-const borrarSeleccionados =
-document.getElementById("borrarSeleccionados");
-
-const themeToggle =
-document.getElementById("themeToggle");
-
-// VARIABLES
-
-let registros = [];
-
-let seleccionados = [];
-
-let sectorActual = "Campo";
+const exportarPDF =
+document.getElementById("exportarPDF");
 
 // MENU
 
-menuToggle.addEventListener("click",()=>{
+menuToggle.addEventListener("click", () => {
 
   sidebar.classList.toggle("hidden");
+
+  adminMain.classList.toggle("expandido");
 
 });
 
 // DARK MODE
 
-themeToggle.addEventListener("change",()=>{
+modoBtn.addEventListener("click", () => {
 
   document.body.classList.toggle("dark");
 
+  localStorage.setItem(
+    "modo",
+    document.body.classList.contains("dark")
+  );
+
 });
+
+if(localStorage.getItem("modo") === "true"){
+
+  document.body.classList.add("dark");
+
+}
 
 // FECHA
 
@@ -114,16 +124,16 @@ function actualizarHora(){
 
   fechaActual.innerHTML =
 
-    ahora.toLocaleDateString("es-AR") +
+  ahora.toLocaleDateString("es-AR") +
 
-    " • " +
+  " • " +
 
-    ahora.toLocaleTimeString("es-AR",{
+  ahora.toLocaleTimeString("es-AR",{
 
-      hour:"2-digit",
-      minute:"2-digit"
+    hour:"2-digit",
+    minute:"2-digit"
 
-    });
+  });
 
 }
 
@@ -131,13 +141,19 @@ setInterval(actualizarHora,1000);
 
 actualizarHora();
 
+// VARIABLES
+
+let registros = [];
+
+let sectorActual = "Campo";
+
 // SECTORES
 
-botonesSector.forEach((boton)=>{
+botonesSector.forEach((boton) => {
 
-  boton.addEventListener("click",()=>{
+  boton.addEventListener("click", () => {
 
-    botonesSector.forEach((b)=>{
+    botonesSector.forEach((b) => {
 
       b.classList.remove("active");
 
@@ -154,38 +170,64 @@ botonesSector.forEach((boton)=>{
 
 });
 
-// EXPANDIR TEXTO
+// VER MAS
 
-window.toggleTexto = function(textoId,cardId){
+window.toggleTexto = function(id){
 
-  const texto =
-  document.getElementById(textoId);
-
-  const card =
-  document.getElementById(cardId);
-
-  texto.classList.toggle("oculta");
-
-  card.classList.toggle("expandido");
+  document
+  .getElementById(id)
+  .classList
+  .toggle("oculta");
 
 };
 
-// SELECCIONAR
+// BORRAR
 
-window.toggleSeleccion = function(id){
+window.eliminarRegistro = async function(id){
 
-  if(seleccionados.includes(id)){
+  const confirmar =
+  confirm("Eliminar informe?");
 
-    seleccionados =
-    seleccionados.filter(
-      item => item !== id
-    );
+  if(!confirmar) return;
 
-  }else{
+  await deleteDoc(
+    doc(db,"registros",id)
+  );
 
-    seleccionados.push(id);
+};
 
+// CAMBIAR ESTADO
+
+window.cambiarEstado = async function(id,estadoActual){
+
+  const estados = [
+
+    "Ok",
+    "Observacion",
+    "Urgente",
+    "EnProceso",
+    "Resuelto"
+
+  ];
+
+  let index =
+  estados.indexOf(estadoActual);
+
+  index++;
+
+  if(index >= estados.length){
+    index = 0;
   }
+
+  await updateDoc(
+
+    doc(db,"registros",id),
+
+    {
+      estado: estados[index]
+    }
+
+  );
 
 };
 
@@ -198,16 +240,20 @@ function mostrar(lista){
   totalRegistros.innerHTML =
   lista.length;
 
-  lista.forEach((registro,index)=>{
+  lista.forEach((registro,index) => {
 
-    let colorEstado = "#22c55e";
+    let colorEstado = "#3b82f6";
+
+    if(registro.estado === "Observacion"){
+      colorEstado = "#f59e0b";
+    }
 
     if(registro.estado === "Urgente"){
       colorEstado = "#ef4444";
     }
 
-    if(registro.estado === "En Proceso"){
-      colorEstado = "#9333ea";
+    if(registro.estado === "EnProceso"){
+      colorEstado = "#8b5cf6";
     }
 
     if(registro.estado === "Resuelto"){
@@ -217,23 +263,13 @@ function mostrar(lista){
     const textoId =
     "texto" + index;
 
-    const cardId =
-    "card" + index;
-
     const textoLargo =
     registro.descripcion &&
     registro.descripcion.length > 180;
 
     contenedor.innerHTML += `
 
-      <div class="registro-card"
-           id="${cardId}">
-
-        <input
-          type="checkbox"
-          class="select-registro"
-          onchange="toggleSeleccion('${registro.fecha}')"
-        >
+      <div class="registro-card">
 
         <div class="registro-header">
 
@@ -249,10 +285,8 @@ function mostrar(lista){
 
           </div>
 
-          <div
-            class="estado"
-            style="background:${colorEstado}"
-          >
+          <div class="estado"
+               style="background:${colorEstado}">
 
             ${registro.estado}
 
@@ -273,7 +307,7 @@ function mostrar(lista){
 
           <span
             class="ver-mas"
-            onclick="toggleTexto('${textoId}','${cardId}')"
+            onclick="toggleTexto('${textoId}')"
           >
 
             Ver más
@@ -285,37 +319,54 @@ function mostrar(lista){
         <div class="info">
 
           <span>
-            📍 ${registro.coordenadas}
+            📍 ${registro.coordenadas || "Sin ubicación"}
           </span>
 
           <span>
-            🕒 ${registro.fecha}
+            🕒 ${registro.fecha || "Sin fecha"}
           </span>
 
         </div>
 
-        ${registro.imagen ? `
+        <div class="fotos-grid">
 
-          <div class="foto-box">
+          ${(registro.imagenes || [registro.imagen]).map((img) => `
 
-            <img
-              src="${registro.imagen}"
-              class="preview-img"
-            >
+            <a href="${img}"
+               target="_blank">
 
-            <a
-              href="${registro.imagen}"
-              target="_blank"
-              class="ver-foto"
-            >
-
-              Ver Imagen
+              <img
+                src="${img}"
+                class="preview-img"
+              >
 
             </a>
 
-          </div>
+          `).join("")}
 
-        ` : ""}
+        </div>
+
+        <div class="card-actions">
+
+          <button
+            class="btn-status"
+            onclick="cambiarEstado('${registro.id}','${registro.estado}')"
+          >
+
+            Cambiar Estado
+
+          </button>
+
+          <button
+            class="btn-delete"
+            onclick="eliminarRegistro('${registro.id}')"
+          >
+
+            Eliminar
+
+          </button>
+
+        </div>
 
       </div>
 
@@ -339,23 +390,22 @@ function filtrar(){
   filtroFecha.value;
 
   const filtrados =
-  registros.filter((r)=>{
+  registros.filter((r) => {
 
     const coincideNombre =
 
-      r.nombre
-      .toLowerCase()
-      .includes(texto);
+    r.nombre
+    .toLowerCase()
+    .includes(texto);
 
     const coincideSector =
-
-      r.sector === sectorActual;
+    r.sector === sectorActual;
 
     const coincideEstado =
 
-      estado === "Todos" ||
+    estado === "Todos" ||
 
-      r.estado === estado;
+    r.estado === estado;
 
     let coincideFecha = true;
 
@@ -384,98 +434,40 @@ function filtrar(){
 
 // EVENTOS
 
-buscador.addEventListener("input",filtrar);
+buscador.addEventListener("input", filtrar);
 
-filtroEstado.addEventListener("change",filtrar);
+filtroEstado.addEventListener("change", filtrar);
 
-filtroFecha.addEventListener("change",filtrar);
+filtroFecha.addEventListener("change", filtrar);
 
-// FECHAS
+// PDF
 
-function generarFechas(){
+exportarPDF.addEventListener("click", () => {
 
-  const hoy =
-  new Date();
-
-  const fin =
-  new Date("2026-12-31");
-
-  while(hoy <= fin){
-
-    const fecha =
-
-    hoy.toISOString().split("T")[0];
-
-    filtroFecha.innerHTML += `
-
-      <option value="${fecha}">
-        ${fecha}
-      </option>
-
-    `;
-
-    hoy.setDate(
-      hoy.getDate() + 1
-    );
-
-  }
-
-}
-
-generarFechas();
-
-// EXPORTAR
-
-exportarSeleccionados
-.addEventListener("click",()=>{
-
-  const seleccion =
-  registros.filter((r)=>
-
-    seleccionados.includes(r.fecha)
-
-  );
-
-  console.log(seleccion);
-
-  alert(
-    "Seleccionados: " +
-    seleccion.length
-  );
-
-});
-
-// ELIMINAR
-
-borrarSeleccionados
-.addEventListener("click",()=>{
-
-  registros =
-  registros.filter((r)=>
-
-    !seleccionados.includes(r.fecha)
-
-  );
-
-  seleccionados = [];
-
-  filtrar();
+  window.print();
 
 });
 
 // FIREBASE
 
 const q = query(
+
   collection(db,"registros")
+
 );
 
-onSnapshot(q,(snapshot)=>{
+onSnapshot(q, (snapshot) => {
 
   registros = [];
 
-  snapshot.forEach((doc)=>{
+  snapshot.forEach((docu) => {
 
-    registros.push(doc.data());
+    registros.push({
+
+      id: docu.id,
+      ...docu.data()
+
+    });
 
   });
 
