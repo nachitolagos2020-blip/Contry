@@ -74,13 +74,27 @@ const filtroEstado =
 const botonesSector =
   document.querySelectorAll(".sector-btn");
 
+const sidebar =
+  document.getElementById("sidebar");
+
+const menuToggle =
+  document.getElementById("menuToggle");
+
+// MENU
+
+menuToggle.addEventListener("click", () => {
+
+  sidebar.classList.toggle("hidden");
+
+});
+
 // VARIABLES
 
 let registros = [];
 
 let sectorActual = "Campo";
 
-// BOTONES
+// SECTORES
 
 botonesSector.forEach((boton) => {
 
@@ -168,7 +182,7 @@ function mostrar(lista){
           </span>
 
           <span>
-            🕒 ${new Date(registro.fecha).toLocaleString()}
+            🕒 ${registro.fecha}
           </span>
 
         </div>
