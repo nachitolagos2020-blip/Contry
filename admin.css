@@ -110,9 +110,6 @@ body{
     #1f1f1f
   );
 
-  border-right:
-  1px solid rgba(255,255,255,0.03);
-
   padding:85px 22px 22px 22px;
 
   transition:0.35s ease;
@@ -126,8 +123,6 @@ body{
   width:0;
 
   padding:0;
-
-  border:none;
 
 }
 
@@ -174,9 +169,6 @@ body{
   text-align:center;
 
   margin-bottom:28px;
-
-  border:
-  1px solid rgba(255,255,255,0.04);
 
 }
 
@@ -234,12 +226,6 @@ body{
 
 }
 
-.sector-btn:hover{
-
-  transform:translateX(4px);
-
-}
-
 .sector-btn.active{
 
   background:
@@ -266,6 +252,12 @@ body{
 
 }
 
+.admin-main.expandido{
+
+  padding-left:80px;
+
+}
+
 /* TOP PANEL */
 
 .top-panel{
@@ -280,7 +272,7 @@ body{
 
   border-radius:24px;
 
-  padding:20px;
+  padding:18px;
 
   display:flex;
 
@@ -292,11 +284,22 @@ body{
 
   margin-bottom:18px;
 
-  border:
-  1px solid rgba(0,0,0,0.05);
-
   box-shadow:
   0 6px 20px rgba(0,0,0,0.04);
+
+}
+
+.top-info{
+
+  margin-left:50px;
+
+  transition:0.35s;
+
+}
+
+.admin-main.expandido .top-info{
+
+  margin-left:0;
 
 }
 
@@ -322,46 +325,45 @@ body{
 
   display:flex;
 
-  gap:12px;
+  gap:10px;
 
   flex-wrap:wrap;
 
 }
 
 #buscador,
-#filtroEstado{
+#filtroEstado,
+#filtroFecha{
 
   background:white;
 
   border:none;
 
-  padding:15px;
+  padding:14px;
 
   border-radius:14px;
 
-  min-width:210px;
+  min-width:180px;
 
   font-size:14px;
 
   font-weight:700;
-
-  color:#111827;
 
   border:
   1px solid rgba(0,0,0,0.06);
 
 }
 
-/* REGISTROS */
+/* GRID */
 
 #contenedorRegistros{
 
   display:grid;
 
   grid-template-columns:
-  repeat(auto-fill,minmax(300px,1fr));
+  repeat(auto-fill,minmax(290px,1fr));
 
-  gap:16px;
+  gap:14px;
 
 }
 
@@ -377,23 +379,15 @@ body{
     #f4f4f5
   );
 
-  border-radius:24px;
+  border-radius:22px;
 
-  padding:20px;
+  padding:18px;
 
   border:
   1px solid rgba(0,0,0,0.05);
 
   box-shadow:
   0 5px 18px rgba(0,0,0,0.05);
-
-  transition:0.25s;
-
-}
-
-.registro-card:hover{
-
-  transform:translateY(-3px);
 
 }
 
@@ -403,7 +397,7 @@ body{
 
   justify-content:space-between;
 
-  gap:12px;
+  gap:10px;
 
   margin-bottom:14px;
 
@@ -411,7 +405,7 @@ body{
 
 .registro-header h3{
 
-  font-size:22px;
+  font-size:20px;
 
   font-weight:800;
 
@@ -421,19 +415,15 @@ body{
 
   color:#71717a;
 
-  margin-top:4px;
-
   font-size:13px;
 
-  font-weight:600;
+  margin-top:4px;
 
 }
 
-/* ESTADO */
-
 .estado{
 
-  padding:9px 13px;
+  padding:8px 12px;
 
   border-radius:999px;
 
@@ -461,15 +451,21 @@ body{
 
   border-radius:16px;
 
-  padding:16px;
+  padding:14px;
 
-  margin-bottom:16px;
+  margin-bottom:14px;
 
   line-height:1.6;
 
+  font-size:14px;
+
   font-weight:600;
 
-  font-size:14px;
+  word-break:break-word;
+
+}
+
+.descripcion.oculta{
 
   overflow:hidden;
 
@@ -479,7 +475,21 @@ body{
 
   -webkit-box-orient:vertical;
 
-  word-break:break-word;
+}
+
+.ver-mas{
+
+  margin-top:10px;
+
+  display:inline-block;
+
+  color:#2563eb;
+
+  font-weight:700;
+
+  cursor:pointer;
+
+  font-size:13px;
 
 }
 
@@ -493,7 +503,7 @@ body{
 
   gap:6px;
 
-  margin-bottom:16px;
+  margin-bottom:14px;
 
   color:#52525b;
 
@@ -517,16 +527,13 @@ body{
 
 .preview-img{
 
-  width:80px;
+  width:75px;
 
-  height:80px;
+  height:75px;
 
   border-radius:14px;
 
   object-fit:cover;
-
-  border:
-  2px solid rgba(0,0,0,0.06);
 
 }
 
@@ -544,39 +551,13 @@ body{
 
   text-decoration:none;
 
-  padding:10px 15px;
+  padding:10px 14px;
 
   border-radius:12px;
 
   font-weight:700;
 
   font-size:13px;
-
-  transition:0.25s;
-
-}
-
-.ver-foto:hover{
-
-  transform:translateY(-2px);
-
-}
-
-/* LOGIN */
-
-.login-error{
-
-  min-height:100vh;
-
-  display:flex;
-
-  justify-content:center;
-
-  align-items:center;
-
-  font-size:40px;
-
-  font-weight:800;
 
 }
 
@@ -599,7 +580,8 @@ body{
   }
 
   #buscador,
-  #filtroEstado{
+  #filtroEstado,
+  #filtroFecha{
 
     width:100%;
 
