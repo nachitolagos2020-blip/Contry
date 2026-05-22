@@ -1,93 +1,199 @@
 <!DOCTYPE html>
-      <h1>Country</h1>
-      <p>Panel de Supervisión</p>
-    </div>
+<html lang="es">
 
-    <div class="sidebar-box">
-      <span id="totalRegistros">0</span>
-      Informes Totales
-    </div>
+<head>
 
-    <div class="theme-box">
-      <button id="toggleTheme">
-        🌙 / ☀️ Cambiar Tema
-      </button>
-    </div>
+  <meta charset="UTF-8">
 
-    <div class="sectores">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
-      <button class="sector-btn active" data-sector="Campo">
-        🌱 Campo
-      </button>
+  <title>Country Admin</title>
 
-      <button class="sector-btn" data-sector="Electricidad">
-        ⚡ Electricidad
-      </button>
+  <link rel="stylesheet"
+        href="admin.css">
 
-      <button class="sector-btn" data-sector="Plomeria">
-        🚰 Plomeria
-      </button>
+</head>
 
-      <button class="sector-btn" data-sector="Tecnica">
-        🛠 Tecnica
-      </button>
+<body>
 
-      <button class="sector-btn" data-sector="Mantenimiento">
-        🔧 Mantenimiento
-      </button>
+  <div class="background"></div>
 
-      <button class="sector-btn" data-sector="Taller">
-        🚗 Taller
-      </button>
+  <!-- MENU -->
 
-    </div>
+  <button id="menuToggle">
+    ☰
+  </button>
 
-  </aside>
+  <div class="admin-layout">
 
-  <main class="admin-main" id="adminMain">
+    <!-- SIDEBAR -->
 
-    <div class="top-panel">
+    <aside class="sidebar"
+           id="sidebar">
 
-      <div class="top-info">
-        <h2>Informes</h2>
-        <p>Registros en tiempo real</p>
+      <div>
+
+        <h1>
+          Country
+        </h1>
+
+        <p>
+          Panel de Supervisión
+        </p>
+
       </div>
 
-      <div class="filtros">
+      <div class="sidebar-box">
 
-        <input
-          type="text"
-          id="buscador"
-          placeholder="Buscar trabajador..."
-        >
+        <span id="totalRegistros">
+          0
+        </span>
 
-        <select id="filtroEstado">
-          <option value="Todos">Todos</option>
-          <option value="Ok">Ok</option>
-          <option value="Observacion">Observacion</option>
-          <option value="Urgente">Urgente</option>
-          <option value="Finalizado">Finalizado</option>
-        </select>
+        Informes Totales
 
-        <input type="date" id="filtroFecha">
+      </div>
 
-        <button id="exportarPDF" class="action-btn">
+      <div class="sidebar-actions">
+
+        <button id="modoBtn">
+          🌙 Modo Oscuro
+        </button>
+
+        <button id="exportarPDF">
           📄 Exportar PDF
         </button>
 
-        <div class="fecha-actual" id="fechaActual"></div>
+      </div>
+
+      <div class="sectores">
+
+        <button class="sector-btn active"
+                data-sector="Campo">
+
+          🌱 Campo
+
+        </button>
+
+        <button class="sector-btn"
+                data-sector="Electricidad">
+
+          ⚡ Electricidad
+
+        </button>
+
+        <button class="sector-btn"
+                data-sector="Plomeria">
+
+          🚰 Plomeria
+
+        </button>
+
+        <button class="sector-btn"
+                data-sector="Tecnica">
+
+          🛠 Tecnica
+
+        </button>
+
+        <button class="sector-btn"
+                data-sector="Mantenimiento">
+
+          🔧 Mantenimiento
+
+        </button>
+
+        <button class="sector-btn"
+                data-sector="Taller">
+
+          🚗 Taller
+
+        </button>
 
       </div>
 
-    </div>
+    </aside>
 
-    <div id="contenedorRegistros"></div>
+    <!-- MAIN -->
 
-  </main>
+    <main class="admin-main"
+          id="adminMain">
 
-</div>
+      <div class="top-panel">
 
-<script type="module" src="admin.js"></script>
+        <div class="top-info">
+
+          <h2>
+            Informes
+          </h2>
+
+          <p>
+            Registros en tiempo real
+          </p>
+
+        </div>
+
+        <div class="filtros">
+
+          <input
+            type="text"
+            id="buscador"
+            placeholder="Buscar trabajador..."
+          >
+
+          <select id="filtroEstado">
+
+            <option value="Todos">
+              Todos
+            </option>
+
+            <option value="Ok">
+              Ok
+            </option>
+
+            <option value="Observacion">
+              Observacion
+            </option>
+
+            <option value="Urgente">
+              Urgente
+            </option>
+
+            <option value="EnProceso">
+              En Proceso
+            </option>
+
+            <option value="Resuelto">
+              Resuelto
+            </option>
+
+          </select>
+
+          <input
+            type="date"
+            id="filtroFecha"
+          >
+
+          <div class="fecha-actual"
+               id="fechaActual">
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <div id="contenedorRegistros"></div>
+
+    </main>
+
+  </div>
+
+  <script type="module"
+          src="admin.js">
+
+  </script>
 
 </body>
+
 </html>
