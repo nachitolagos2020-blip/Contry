@@ -1,9 +1,6 @@
-import { initializeApp }
-
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
 import {
-
   getFirestore,
   collection,
   onSnapshot,
@@ -11,468 +8,192 @@ import {
   deleteDoc,
   doc,
   updateDoc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-}
+import {
+  getAuth,
+  signInWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-// LOGIN
-
-const password = prompt("Contraseña");
-
-if(password !== "country2026"){
-
-  document.body.innerHTML = `
-    <div class="login-error">
-      Contraseña incorrecta
-    </div>
-  `;
-
-  throw new Error("Sin acceso");
-
-}
-
-// FIREBASE
-
+/* FIREBASE */
 const firebaseConfig = {
-
   apiKey: "AIzaSyDVI76qVw8v00Kr6sG537oIP2yw4AdR5-g",
   authDomain: "contry-c4953.firebaseapp.com",
   projectId: "contry-c4953",
   storageBucket: "contry-c4953.firebasestorage.app",
   messagingSenderId: "775091873432",
   appId: "1:775091873432:web:93331d930a4aa1063c52ed"
-
 };
 
 const app = initializeApp(firebaseConfig);
-
 const db = getFirestore(app);
+const auth = getAuth(app);
 
-// ELEMENTOS
+/* ELEMENTOS */
+const contenedor = document.getElementById("contenedorRegistros");
+const totalRegistros = document.getElementById("totalRegistros");
+const buscador = document.getElementById("buscador");
+const filtroEstado = document.getElementById("filtroEstado");
+const filtroFecha = document.getElementById("filtroFecha");
+const botonesSector = document.querySelectorAll(".sector-btn");
+const sidebar = document.getElementById("sidebar");
+const menuToggle = document.getElementById("menuToggle");
+const fechaActual = document.getElementById("fechaActual");
+const modoBtn = document.getElementById("modoBtn");
+const exportarPDF = document.getElementById("exportarPDF");
 
-const contenedor =
-document.getElementById("contenedorRegistros");
-
-const totalRegistros =
-document.getElementById("totalRegistros");
-
-const buscador =
-document.getElementById("buscador");
-
-const filtroEstado =
-document.getElementById("filtroEstado");
-
-const filtroFecha =
-document.getElementById("filtroFecha");
-
-const botonesSector =
-document.querySelectorAll(".sector-btn");
-
-const sidebar =
-document.getElementById("sidebar");
-
-const menuToggle =
-document.getElementById("menuToggle");
-
-const adminMain =
-document.getElementById("adminMain");
-
-const fechaActual =
-document.getElementById("fechaActual");
-
-const modoBtn =
-document.getElementById("modoBtn");
-
-const exportarPDF =
-document.getElementById("exportarPDF");
-
-// MENU
-
-menuToggle.addEventListener("click", () => {
-
-  sidebar.classList.toggle("hidden");
-
-  adminMain.classList.toggle("expandido");
-
-});
-
-// DARK MODE
-
-modoBtn.addEventListener("click", () => {
-
-  document.body.classList.toggle("dark");
-
-  localStorage.setItem(
-    "modo",
-    document.body.classList.contains("dark")
-  );
-
-});
-
-if(localStorage.getItem("modo") === "true"){
-
-  document.body.classList.add("dark");
-
-}
-
-// FECHA
-
-function actualizarHora(){
-
-  const ahora = new Date();
-
-  fechaActual.innerHTML =
-
-  ahora.toLocaleDateString("es-AR") +
-
-  " • " +
-
-  ahora.toLocaleTimeString("es-AR",{
-
-    hour:"2-digit",
-    minute:"2-digit"
-
-  });
-
-}
-
-setInterval(actualizarHora,1000);
-
-actualizarHora();
-
-// VARIABLES
-
+/* STATE */
 let registros = [];
-
 let sectorActual = "Campo";
 
-// SECTORES
+/* LOGIN REAL */
+const email = prompt("Email admin");
+const password = prompt("Contraseña");
 
-botonesSector.forEach((boton) => {
-
-  boton.addEventListener("click", () => {
-
-    botonesSector.forEach((b) => {
-
-      b.classList.remove("active");
-
-    });
-
-    boton.classList.add("active");
-
-    sectorActual =
-    boton.dataset.sector;
-
-    filtrar();
-
-  });
-
+signInWithEmailAndPassword(auth,email,password)
+.catch(() => {
+  document.body.innerHTML = "<h2 style='color:red;text-align:center'>Acceso denegado</h2>";
 });
 
-// VER MAS
+/* UI */
+menuToggle.onclick = () => sidebar.classList.toggle("hidden");
 
-window.toggleTexto = function(id){
-
-  document
-  .getElementById(id)
-  .classList
-  .toggle("oculta");
-
+modoBtn.onclick = () => {
+  document.body.classList.toggle("dark");
+  localStorage.setItem("dark", document.body.classList.contains("dark"));
 };
 
-// BORRAR
+if(localStorage.getItem("dark") === "true"){
+  document.body.classList.add("dark");
+}
 
-window.eliminarRegistro = async function(id){
+/* FECHA */
+setInterval(() => {
+  const ahora = new Date();
+  fechaActual.textContent =
+    ahora.toLocaleDateString("es-AR") +
+    " • " +
+    ahora.toLocaleTimeString("es-AR",{hour:"2-digit",minute:"2-digit"});
+},1000);
 
-  const confirmar =
-  confirm("Eliminar informe?");
+/* SANITIZE */
+function limpiarHTML(t=""){
+  return t
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;");
+}
 
-  if(!confirmar) return;
-
-  await deleteDoc(
-    doc(db,"registros",id)
-  );
-
-};
-
-// CAMBIAR ESTADO
-
-window.cambiarEstado = async function(id,estadoActual){
-
-  const estados = [
-
-    "Ok",
-    "Observacion",
-    "Urgente",
-    "EnProceso",
-    "Resuelto"
-
-  ];
-
-  let index =
-  estados.indexOf(estadoActual);
-
-  index++;
-
-  if(index >= estados.length){
-    index = 0;
+/* DELETE */
+window.eliminarRegistro = async (id) => {
+  try {
+    await deleteDoc(doc(db,"registros",id));
+  } catch (e) {
+    alert("Error al eliminar");
   }
-
-  await updateDoc(
-
-    doc(db,"registros",id),
-
-    {
-      estado: estados[index]
-    }
-
-  );
-
 };
 
-// MOSTRAR
+/* CAMBIAR ESTADO */
+window.cambiarEstado = async (id,estado) => {
+  const estados = ["Ok","Observacion","Urgente","EnProceso","Resuelto"];
 
+  let i = estados.indexOf(estado);
+  i = (i + 1) % estados.length;
+
+  await updateDoc(doc(db,"registros",id),{
+    estado: estados[i]
+  });
+};
+
+/* RENDER */
 function mostrar(lista){
 
   contenedor.innerHTML = "";
+  totalRegistros.textContent = lista.length;
 
-  totalRegistros.innerHTML =
-  lista.length;
+  let html = "";
 
-  lista.forEach((registro,index) => {
+  lista.forEach(r => {
 
-    let colorEstado = "#3b82f6";
+    const imgs = r.imagenes || (r.imagen ? [r.imagen] : []);
 
-    if(registro.estado === "Observacion"){
-      colorEstado = "#f59e0b";
-    }
-
-    if(registro.estado === "Urgente"){
-      colorEstado = "#ef4444";
-    }
-
-    if(registro.estado === "EnProceso"){
-      colorEstado = "#8b5cf6";
-    }
-
-    if(registro.estado === "Resuelto"){
-      colorEstado = "#22c55e";
-    }
-
-    const textoId =
-    "texto" + index;
-
-    const textoLargo =
-    registro.descripcion &&
-    registro.descripcion.length > 180;
-
-    contenedor.innerHTML += `
-
+    html += `
       <div class="registro-card">
 
-        <div class="registro-header">
+        <h3>${limpiarHTML(r.nombre || "")}</h3>
 
-          <div>
+        <div>${limpiarHTML(r.estado || "")}</div>
 
-            <h3>
-              ${registro.nombre}
-            </h3>
+        <p>${limpiarHTML(r.descripcion || "")}</p>
 
-            <div class="sector-mini">
-              ${registro.sector}
-            </div>
-
-          </div>
-
-          <div class="estado"
-               style="background:${colorEstado}">
-
-            ${registro.estado}
-
-          </div>
-
+        <div>
+          ${imgs.map(img => `<img src="${img}" width="70"/>`).join("")}
         </div>
 
-        <div
-          class="descripcion ${textoLargo ? "oculta" : ""}"
-          id="${textoId}"
-        >
+        <button class="btn-status"
+          onclick="cambiarEstado('${r.id}','${r.estado}')">
+          Cambiar estado
+        </button>
 
-          ${registro.descripcion}
-
-        </div>
-
-        ${textoLargo ? `
-
-          <span
-            class="ver-mas"
-            onclick="toggleTexto('${textoId}')"
-          >
-
-            Ver más
-
-          </span>
-
-        ` : ""}
-
-        <div class="info">
-
-          <span>
-            📍 ${registro.coordenadas || "Sin ubicación"}
-          </span>
-
-          <span>
-            🕒 ${registro.fecha || "Sin fecha"}
-          </span>
-
-        </div>
-
-        <div class="fotos-grid">
-
-          ${(registro.imagenes || [registro.imagen]).map((img) => `
-
-            <a href="${img}"
-               target="_blank">
-
-              <img
-                src="${img}"
-                class="preview-img"
-              >
-
-            </a>
-
-          `).join("")}
-
-        </div>
-
-        <div class="card-actions">
-
-          <button
-            class="btn-status"
-            onclick="cambiarEstado('${registro.id}','${registro.estado}')"
-          >
-
-            Cambiar Estado
-
-          </button>
-
-          <button
-            class="btn-delete"
-            onclick="eliminarRegistro('${registro.id}')"
-          >
-
-            Eliminar
-
-          </button>
-
-        </div>
+        <button class="btn-delete"
+          onclick="eliminarRegistro('${r.id}')">
+          Eliminar
+        </button>
 
       </div>
-
     `;
-
   });
 
+  contenedor.innerHTML = html;
 }
 
-// FILTRAR
-
+/* FILTRO */
 function filtrar(){
 
-  const texto =
-  buscador.value.toLowerCase();
+  const texto = buscador.value.toLowerCase();
 
-  const estado =
-  filtroEstado.value;
+  let filtrados = registros.filter(r =>
+    r.sector === sectorActual &&
+    (filtroEstado.value === "Todos" || r.estado === filtroEstado.value) &&
+    (r.nombre || "").toLowerCase().includes(texto)
+  );
 
-  const fecha =
-  filtroFecha.value;
+  const prioridad = {
+    Urgente:0,
+    EnProceso:1,
+    Observacion:2,
+    Ok:3,
+    Resuelto:4
+  };
 
-  const filtrados =
-  registros.filter((r) => {
-
-    const coincideNombre =
-
-    r.nombre
-    .toLowerCase()
-    .includes(texto);
-
-    const coincideSector =
-    r.sector === sectorActual;
-
-    const coincideEstado =
-
-    estado === "Todos" ||
-
-    r.estado === estado;
-
-    let coincideFecha = true;
-
-    if(fecha){
-
-      coincideFecha =
-      r.fecha &&
-      r.fecha.includes(fecha);
-
-    }
-
-    return (
-
-      coincideNombre &&
-      coincideSector &&
-      coincideEstado &&
-      coincideFecha
-
-    );
-
-  });
+  filtrados.sort((a,b) =>
+    (prioridad[a.estado] ?? 99) -
+    (prioridad[b.estado] ?? 99)
+  );
 
   mostrar(filtrados);
-
 }
 
-// EVENTOS
+/* EVENTS */
+buscador.oninput = filtrar;
+filtroEstado.onchange = filtrar;
+filtroFecha.onchange = filtrar;
 
-buscador.addEventListener("input", filtrar);
-
-filtroEstado.addEventListener("change", filtrar);
-
-filtroFecha.addEventListener("change", filtrar);
-
-// PDF
-
-exportarPDF.addEventListener("click", () => {
-
-  window.print();
-
+botonesSector.forEach(b => {
+  b.onclick = () => {
+    botonesSector.forEach(x => x.classList.remove("active"));
+    b.classList.add("active");
+    sectorActual = b.dataset.sector;
+    filtrar();
+  };
 });
 
-// FIREBASE
+/* FIREBASE */
+const q = query(collection(db,"registros"));
 
-const q = query(
-
-  collection(db,"registros")
-
-);
-
-onSnapshot(q, (snapshot) => {
-
+onSnapshot(q,(snap)=>{
   registros = [];
-
-  snapshot.forEach((docu) => {
-
-    registros.push({
-
-      id: docu.id,
-      ...docu.data()
-
-    });
-
-  });
-
+  snap.forEach(d => registros.push({id:d.id,...d.data()}));
   registros.reverse();
-
   filtrar();
-
 });
