@@ -14,6 +14,27 @@ import {
 
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+// LOGIN
+
+const password =
+  prompt("Contraseña");
+
+if(password !== "country2026"){
+
+  document.body.innerHTML = `
+
+    <div class="login-error">
+
+      Contraseña incorrecta
+
+    </div>
+
+  `;
+
+  throw new Error("Sin acceso");
+
+}
+
 // FIREBASE
 
 const firebaseConfig = {
@@ -41,52 +62,42 @@ const db = getFirestore(app);
 const contenedor =
   document.getElementById("contenedorRegistros");
 
+const totalRegistros =
+  document.getElementById("totalRegistros");
+
 const buscador =
   document.getElementById("buscador");
 
-const totalRegistros =
-  document.getElementById("totalRegistros");
+const filtroEstado =
+  document.getElementById("filtroEstado");
 
 const botonesSector =
   document.querySelectorAll(".sector-btn");
 
-// LOGIN SIMPLE
-
-const password =
-  prompt("Contraseña");
-
-if(password !== "country2026"){
-
-  document.body.innerHTML = `
-
-    <div class="login-error">
-
-      Contraseña incorrecta
-
-    </div>
-
-  `;
-
-  throw new Error("Sin acceso");
-
-}
-
 // VARIABLES
+
+let registros = [];
 
 let sectorActual = "Campo";
 
-let todosLosRegistros = [];
-
-// BOTONES SECTOR
+// BOTONES
 
 botonesSector.forEach((boton) => {
 
   boton.addEventListener("click", () => {
 
+    botonesSector.forEach((b) => {
+
+      b.classList.remove("active");
+
+    });
+
+    boton.classList.add("active");
+
     sectorActual =
       boton.dataset.sector;
 
-    filtrarRegistros();
+    filtrar();
 
   });
 
@@ -94,7 +105,7 @@ botonesSector.forEach((boton) => {
 
 // MOSTRAR
 
-function mostrarRegistros(lista){
+function mostrar(lista){
 
   contenedor.innerHTML = "";
 
@@ -103,65 +114,76 @@ function mostrarRegistros(lista){
 
   lista.forEach((registro) => {
 
-    let claseEstado = "ok";
+    let colorEstado = "#3b82f6";
 
     if(registro.estado === "Observacion"){
-      claseEstado = "observacion";
+      colorEstado = "#f59e0b";
     }
 
     if(registro.estado === "Urgente"){
-      claseEstado = "urgente";
+      colorEstado = "#ef4444";
     }
 
     contenedor.innerHTML += `
 
       <div class="registro-card">
 
-        <div class="registro-top">
+        <div class="registro-header">
 
           <div>
 
             <h3>
+
               ${registro.nombre}
+
             </h3>
 
             <div class="sector-mini">
+
               ${registro.sector}
+
             </div>
 
           </div>
 
-          <span class="estado ${claseEstado}">
+          <div class="estado"
+               style="background:${colorEstado}">
+
             ${registro.estado}
-          </span>
+
+          </div>
 
         </div>
 
-        <div class="registro-desc">
+        <div class="descripcion">
 
           ${registro.descripcion}
 
         </div>
 
-        <div class="registro-info">
+        <div class="info">
 
           <span>
             📍 ${registro.coordenadas}
           </span>
 
           <span>
-            🕒 ${registro.fecha}
+            🕒 ${new Date(registro.fecha).toLocaleString()}
           </span>
 
         </div>
 
         ${registro.imagen ? `
 
-          <img
-            src="${registro.imagen}"
-            class="registro-img"
-            onclick="window.open('${registro.imagen}')"
-          >
+          <a href="${registro.imagen}"
+             target="_blank">
+
+            <img
+              src="${registro.imagen}"
+              class="preview-img"
+            >
+
+          </a>
 
         ` : ""}
 
@@ -175,32 +197,52 @@ function mostrarRegistros(lista){
 
 // FILTRAR
 
-function filtrarRegistros(){
+function filtrar(){
 
-  const valor =
+  const texto =
     buscador.value.toLowerCase();
 
+  const estado =
+    filtroEstado.value;
+
   const filtrados =
-    todosLosRegistros.filter((r) =>
+    registros.filter((r) => {
 
-      r.sector === sectorActual &&
+      const coincideNombre =
 
-      r.nombre.toLowerCase()
-      .includes(valor)
+        r.nombre
+        .toLowerCase()
+        .includes(texto);
 
-    );
+      const coincideSector =
 
-  mostrarRegistros(filtrados);
+        r.sector === sectorActual;
+
+      const coincideEstado =
+
+        estado === "Todos" ||
+
+        r.estado === estado;
+
+      return (
+
+        coincideNombre &&
+        coincideSector &&
+        coincideEstado
+
+      );
+
+    });
+
+  mostrar(filtrados);
 
 }
 
-// BUSCADOR
+// EVENTOS
 
-buscador.addEventListener("input", () => {
+buscador.addEventListener("input", filtrar);
 
-  filtrarRegistros();
-
-});
+filtroEstado.addEventListener("change", filtrar);
 
 // FIREBASE REALTIME
 
@@ -214,14 +256,14 @@ const q = query(
 
 onSnapshot(q, (snapshot) => {
 
-  todosLosRegistros = [];
+  registros = [];
 
   snapshot.forEach((doc) => {
 
-    todosLosRegistros.push(doc.data());
+    registros.push(doc.data());
 
   });
 
-  filtrarRegistros();
+  filtrar();
 
 });
