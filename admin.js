@@ -15,7 +15,8 @@ from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 // LOGIN
 
-const password = prompt("Contraseña");
+const password =
+  prompt("Contraseña");
 
 if(password !== "country2026"){
 
@@ -33,9 +34,9 @@ if(password !== "country2026"){
 
 const firebaseConfig = {
 
-  apiKey: "TU_API",
+  apiKey: "TU_API_KEY",
   authDomain: "TU_DOMAIN",
-  projectId: "TU_PROJECT"
+  projectId: "TU_PROJECT_ID"
 
 };
 
@@ -63,22 +64,29 @@ document.getElementById("filtroFecha");
 const botonesSector =
 document.querySelectorAll(".sector-btn");
 
-const fechaActual =
-document.getElementById("fechaActual");
+const sidebar =
+document.getElementById("sidebar");
 
 const menuToggle =
 document.getElementById("menuToggle");
 
-const sidebar =
-document.getElementById("sidebar");
+const fechaActual =
+document.getElementById("fechaActual");
 
-const adminMain =
-document.getElementById("adminMain");
+const exportarSeleccionados =
+document.getElementById("exportarSeleccionados");
+
+const borrarSeleccionados =
+document.getElementById("borrarSeleccionados");
 
 const themeToggle =
 document.getElementById("themeToggle");
 
+// VARIABLES
+
 let registros = [];
+
+let seleccionados = [];
 
 let sectorActual = "Campo";
 
@@ -90,7 +98,7 @@ menuToggle.addEventListener("click",()=>{
 
 });
 
-// TEMA
+// DARK MODE
 
 themeToggle.addEventListener("change",()=>{
 
@@ -98,7 +106,7 @@ themeToggle.addEventListener("change",()=>{
 
 });
 
-// HORA
+// FECHA
 
 function actualizarHora(){
 
@@ -106,16 +114,16 @@ function actualizarHora(){
 
   fechaActual.innerHTML =
 
-  ahora.toLocaleDateString("es-AR") +
+    ahora.toLocaleDateString("es-AR") +
 
-  " • " +
+    " • " +
 
-  ahora.toLocaleTimeString("es-AR",{
+    ahora.toLocaleTimeString("es-AR",{
 
-    hour:"2-digit",
-    minute:"2-digit"
+      hour:"2-digit",
+      minute:"2-digit"
 
-  });
+    });
 
 }
 
@@ -146,6 +154,41 @@ botonesSector.forEach((boton)=>{
 
 });
 
+// EXPANDIR TEXTO
+
+window.toggleTexto = function(textoId,cardId){
+
+  const texto =
+  document.getElementById(textoId);
+
+  const card =
+  document.getElementById(cardId);
+
+  texto.classList.toggle("oculta");
+
+  card.classList.toggle("expandido");
+
+};
+
+// SELECCIONAR
+
+window.toggleSeleccion = function(id){
+
+  if(seleccionados.includes(id)){
+
+    seleccionados =
+    seleccionados.filter(
+      item => item !== id
+    );
+
+  }else{
+
+    seleccionados.push(id);
+
+  }
+
+};
+
 // MOSTRAR
 
 function mostrar(lista){
@@ -171,13 +214,25 @@ function mostrar(lista){
       colorEstado = "#22c55e";
     }
 
+    const textoId =
+    "texto" + index;
+
+    const cardId =
+    "card" + index;
+
+    const textoLargo =
+    registro.descripcion &&
+    registro.descripcion.length > 180;
+
     contenedor.innerHTML += `
 
-      <div class="registro-card">
+      <div class="registro-card"
+           id="${cardId}">
 
         <input
           type="checkbox"
-          class="checkbox-select"
+          class="select-registro"
+          onchange="toggleSeleccion('${registro.fecha}')"
         >
 
         <div class="registro-header">
@@ -205,11 +260,27 @@ function mostrar(lista){
 
         </div>
 
-        <div class="descripcion">
+        <div
+          class="descripcion ${textoLargo ? "oculta" : ""}"
+          id="${textoId}"
+        >
 
           ${registro.descripcion}
 
         </div>
+
+        ${textoLargo ? `
+
+          <span
+            class="ver-mas"
+            onclick="toggleTexto('${textoId}','${cardId}')"
+          >
+
+            Ver más
+
+          </span>
+
+        ` : ""}
 
         <div class="info">
 
@@ -225,10 +296,24 @@ function mostrar(lista){
 
         ${registro.imagen ? `
 
-          <img
-            src="${registro.imagen}"
-            class="preview-img"
-          >
+          <div class="foto-box">
+
+            <img
+              src="${registro.imagen}"
+              class="preview-img"
+            >
+
+            <a
+              href="${registro.imagen}"
+              target="_blank"
+              class="ver-foto"
+            >
+
+              Ver Imagen
+
+            </a>
+
+          </div>
 
         ` : ""}
 
@@ -253,22 +338,24 @@ function filtrar(){
   const fecha =
   filtroFecha.value;
 
-  const filtrados = registros.filter((r)=>{
+  const filtrados =
+  registros.filter((r)=>{
 
     const coincideNombre =
 
-    r.nombre
-    .toLowerCase()
-    .includes(texto);
+      r.nombre
+      .toLowerCase()
+      .includes(texto);
 
     const coincideSector =
-    r.sector === sectorActual;
+
+      r.sector === sectorActual;
 
     const coincideEstado =
 
-    estado === "Todos" ||
+      estado === "Todos" ||
 
-    r.estado === estado;
+      r.estado === estado;
 
     let coincideFecha = true;
 
@@ -307,9 +394,11 @@ filtroFecha.addEventListener("change",filtrar);
 
 function generarFechas(){
 
-  const hoy = new Date();
+  const hoy =
+  new Date();
 
-  const fin = new Date("2026-12-31");
+  const fin =
+  new Date("2026-12-31");
 
   while(hoy <= fin){
 
@@ -334,6 +423,45 @@ function generarFechas(){
 }
 
 generarFechas();
+
+// EXPORTAR
+
+exportarSeleccionados
+.addEventListener("click",()=>{
+
+  const seleccion =
+  registros.filter((r)=>
+
+    seleccionados.includes(r.fecha)
+
+  );
+
+  console.log(seleccion);
+
+  alert(
+    "Seleccionados: " +
+    seleccion.length
+  );
+
+});
+
+// ELIMINAR
+
+borrarSeleccionados
+.addEventListener("click",()=>{
+
+  registros =
+  registros.filter((r)=>
+
+    !seleccionados.includes(r.fecha)
+
+  );
+
+  seleccionados = [];
+
+  filtrar();
+
+});
 
 // FIREBASE
 
