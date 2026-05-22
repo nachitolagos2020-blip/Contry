@@ -7,8 +7,7 @@ import {
   getFirestore,
   collection,
   onSnapshot,
-  query,
-  orderBy
+  query
 
 }
 
@@ -117,6 +116,16 @@ botonesSector.forEach((boton) => {
 
 });
 
+// FORMATEAR FECHA
+
+function formatearFecha(fecha){
+
+  const date = new Date(fecha);
+
+  return date.toLocaleString("es-AR");
+
+}
+
 // MOSTRAR
 
 function mostrar(lista){
@@ -182,7 +191,7 @@ function mostrar(lista){
           </span>
 
           <span>
-            🕒 ${registro.fecha}
+            🕒 ${formatearFecha(registro.fecha)}
           </span>
 
         </div>
@@ -267,13 +276,11 @@ buscador.addEventListener("input", filtrar);
 
 filtroEstado.addEventListener("change", filtrar);
 
-// FIREBASE REALTIME
+// FIREBASE
 
 const q = query(
 
-  collection(db, "registros"),
-
-  orderBy("fecha", "desc")
+  collection(db, "registros")
 
 );
 
@@ -286,6 +293,8 @@ onSnapshot(q, (snapshot) => {
     registros.push(doc.data());
 
   });
+
+  registros.reverse();
 
   filtrar();
 
