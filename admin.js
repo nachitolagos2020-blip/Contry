@@ -175,15 +175,24 @@ function mostrar(lista){
 
         ${registro.imagen ? `
 
-          <a href="${registro.imagen}"
-             target="_blank">
+          <div class="foto-box">
 
             <img
               src="${registro.imagen}"
               class="preview-img"
             >
 
-          </a>
+            <a
+              href="${registro.imagen}"
+              target="_blank"
+              class="ver-foto"
+            >
+
+              Ver Imagen
+
+            </a>
+
+          </div>
 
         ` : ""}
 
