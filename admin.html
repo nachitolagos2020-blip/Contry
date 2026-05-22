@@ -2,11 +2,11 @@
 <html lang="es">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#111827">
   <title>Country Admin</title>
-
-  <link rel="stylesheet" href="admin.css"/>
+  <link rel="stylesheet" href="admin.css">
 </head>
 
 <body>
@@ -17,7 +17,6 @@
 
 <div class="admin-layout">
 
-  <!-- SIDEBAR -->
   <aside class="sidebar" id="sidebar">
 
     <div>
@@ -48,7 +47,6 @@
 
   </aside>
 
-  <!-- MAIN -->
   <main class="admin-main" id="adminMain">
 
     <div class="top-panel">
@@ -60,7 +58,7 @@
 
       <div class="filtros">
 
-        <input type="text" id="buscador" placeholder="Buscar trabajador..."/>
+        <input type="text" id="buscador" placeholder="Buscar trabajador...">
 
         <select id="filtroEstado">
           <option value="Todos">Todos</option>
@@ -71,7 +69,7 @@
           <option value="Resuelto">Resuelto</option>
         </select>
 
-        <input type="date" id="filtroFecha"/>
+        <input type="date" id="filtroFecha">
 
         <div class="fecha-actual" id="fechaActual"></div>
 
@@ -79,9 +77,7 @@
 
     </div>
 
-    <div id="contenedorRegistros">
-      <div class="loading">Cargando registros...</div>
-    </div>
+    <div id="contenedorRegistros"></div>
 
   </main>
 
