@@ -70,6 +70,9 @@ const buscador =
 const filtroEstado =
   document.getElementById("filtroEstado");
 
+const filtroFecha =
+  document.getElementById("filtroFecha");
+
 const botonesSector =
   document.querySelectorAll(".sector-btn");
 
@@ -79,11 +82,16 @@ const sidebar =
 const menuToggle =
   document.getElementById("menuToggle");
 
+const adminMain =
+  document.getElementById("adminMain");
+
 // MENU
 
 menuToggle.addEventListener("click", () => {
 
   sidebar.classList.toggle("hidden");
+
+  adminMain.classList.toggle("expandido");
 
 });
 
@@ -120,11 +128,24 @@ botonesSector.forEach((boton) => {
 
 function formatearFecha(fecha){
 
+  if(!fecha) return "Sin fecha";
+
   const date = new Date(fecha);
 
   return date.toLocaleString("es-AR");
 
 }
+
+// TOGGLE TEXTO
+
+window.toggleTexto = function(id){
+
+  const texto =
+    document.getElementById(id);
+
+  texto.classList.toggle("oculta");
+
+};
 
 // MOSTRAR
 
@@ -135,7 +156,7 @@ function mostrar(lista){
   totalRegistros.innerHTML =
     lista.length;
 
-  lista.forEach((registro) => {
+  lista.forEach((registro,index) => {
 
     let colorEstado = "#3b82f6";
 
@@ -147,6 +168,9 @@ function mostrar(lista){
       colorEstado = "#ef4444";
     }
 
+    const textoId =
+      "texto" + index;
+
     contenedor.innerHTML += `
 
       <div class="registro-card">
@@ -156,15 +180,11 @@ function mostrar(lista){
           <div>
 
             <h3>
-
               ${registro.nombre}
-
             </h3>
 
             <div class="sector-mini">
-
               ${registro.sector}
-
             </div>
 
           </div>
@@ -178,11 +198,23 @@ function mostrar(lista){
 
         </div>
 
-        <div class="descripcion">
+        <div
+          class="descripcion oculta"
+          id="${textoId}"
+        >
 
           ${registro.descripcion}
 
         </div>
+
+        <span
+          class="ver-mas"
+          onclick="toggleTexto('${textoId}')"
+        >
+
+          Ver más...
+
+        </span>
 
         <div class="info">
 
@@ -237,6 +269,9 @@ function filtrar(){
   const estado =
     filtroEstado.value;
 
+  const fecha =
+    filtroFecha.value;
+
   const filtrados =
     registros.filter((r) => {
 
@@ -256,11 +291,22 @@ function filtrar(){
 
         r.estado === estado;
 
+      let coincideFecha = true;
+
+      if(fecha){
+
+        coincideFecha =
+          r.fecha &&
+          r.fecha.includes(fecha);
+
+      }
+
       return (
 
         coincideNombre &&
         coincideSector &&
-        coincideEstado
+        coincideEstado &&
+        coincideFecha
 
       );
 
@@ -275,6 +321,8 @@ function filtrar(){
 buscador.addEventListener("input", filtrar);
 
 filtroEstado.addEventListener("change", filtrar);
+
+filtroFecha.addEventListener("change", filtrar);
 
 // FIREBASE
 
