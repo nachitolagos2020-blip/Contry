@@ -1,422 +1,297 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+let modoSeleccionActivo = false;
+let seleccionados = new Set();
 
-import {
-  getFirestore,
-  collection,
-  onSnapshot,
-  query,
-  deleteDoc,
-  doc,
-  updateDoc
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const barraSeleccion =
+document.getElementById("barraSeleccion");
 
-// LOGIN
+const cantidadSeleccionados =
+document.getElementById("cantidadSeleccionados");
 
-const password = prompt("Contraseña");
+const modoSeleccionBtn =
+document.getElementById("modoSeleccion");
 
-if(password !== "country2026"){
+const eliminarSeleccionadosBtn =
+document.getElementById("eliminarSeleccionados");
 
-  document.body.innerHTML = `
-    <div class="login-error">
-      Contraseña incorrecta
-    </div>
-  `;
+// ACTIVAR SELECCION
 
-  throw new Error("Sin acceso");
+if(modoSeleccionBtn){
 
-}
+  modoSeleccionBtn.addEventListener("click",()=>{
 
-// FIREBASE
+    modoSeleccionActivo =
+    !modoSeleccionActivo;
 
-const firebaseConfig = {
+    seleccionados.clear();
 
-  apiKey: "AIzaSyDVI76qVw8v00Kr6sG537oIP2yw4AdR5-g",
-  authDomain: "contry-c4953.firebaseapp.com",
-  projectId: "contry-c4953",
-  storageBucket: "contry-c4953.firebasestorage.app",
-  messagingSenderId: "775091873432",
-  appId: "1:775091873432:web:93331d930a4aa1063c52ed"
-
-};
-
-const app = initializeApp(firebaseConfig); // 🔧 FIX REAL
-const db = getFirestore(app);
-
-// ELEMENTOS
-
-const contenedor =
-document.getElementById("contenedorRegistros");
-
-const totalRegistros =
-document.getElementById("totalRegistros");
-
-const buscador =
-document.getElementById("buscador");
-
-const filtroEstado =
-document.getElementById("filtroEstado");
-
-const filtroFecha =
-document.getElementById("filtroFecha");
-
-const botonesSector =
-document.querySelectorAll(".sector-btn");
-
-const sidebar =
-document.getElementById("sidebar");
-
-const menuToggle =
-document.getElementById("menuToggle");
-
-const adminMain =
-document.getElementById("adminMain");
-
-const fechaActual =
-document.getElementById("fechaActual");
-
-const modoBtn =
-document.getElementById("modoBtn");
-
-const exportarPDF =
-document.getElementById("exportarPDF");
-
-// MENU
-
-menuToggle.addEventListener("click", () => {
-
-  sidebar.classList.toggle("hidden");
-
-  adminMain.classList.toggle("expandido");
-
-});
-
-// DARK MODE
-
-modoBtn.addEventListener("click", () => {
-
-  document.body.classList.toggle("dark");
-
-  localStorage.setItem(
-    "modo",
-    document.body.classList.contains("dark")
-  );
-
-});
-
-if(localStorage.getItem("modo") === "true"){
-
-  document.body.classList.add("dark");
-
-}
-
-// FECHA
-
-function actualizarHora(){
-
-  const ahora = new Date();
-
-  fechaActual.innerHTML =
-
-  ahora.toLocaleDateString("es-AR") +
-
-  " • " +
-
-  ahora.toLocaleTimeString("es-AR",{
-
-    hour:"2-digit",
-    minute:"2-digit"
-
-  });
-
-}
-
-setInterval(actualizarHora,1000);
-actualizarHora();
-
-// VARIABLES
-
-let registros = [];
-
-let sectorActual = "Campo";
-
-// SECTORES
-
-botonesSector.forEach((boton) => {
-
-  boton.addEventListener("click", () => {
-
-    botonesSector.forEach((b) => {
-      b.classList.remove("active");
-    });
-
-    boton.classList.add("active");
-
-    sectorActual = boton.dataset.sector;
+    actualizarBarraSeleccion();
 
     filtrar();
 
   });
 
-});
-
-// VER MAS
-
-window.toggleTexto = function(id){
-
-  document.getElementById(id).classList.toggle("oculta");
-
-};
-
-// BORRAR
-
-window.eliminarRegistro = async function(id){
-
-  const confirmar = confirm("Eliminar informe?");
-  if(!confirmar) return;
-
-  await deleteDoc(doc(db,"registros",id));
-
-};
-
-// CAMBIAR ESTADO
-
-window.cambiarEstado = async function(id,estadoActual){
-
-  const estados = [
-    "Ok",
-    "Observacion",
-    "Urgente",
-    "EnProceso",
-    "Resuelto"
-  ];
-
-  let index = estados.indexOf(estadoActual);
-  index++;
-
-  if(index >= estados.length){
-    index = 0;
-  }
-
-  await updateDoc(doc(db,"registros",id),{
-    estado: estados[index]
-  });
-
-};
-
-// 🔧 FIX SEGURIDAD MINIMO
-function escapeHTML(text=""){
-  return String(text)
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;");
 }
 
-// MOSTRAR
+// ELIMINAR MASIVO
+
+if(eliminarSeleccionadosBtn){
+
+  eliminarSeleccionadosBtn.addEventListener("click",async()=>{
+
+    if(seleccionados.size === 0) return;
+
+    const confirmar =
+    confirm(`Eliminar ${seleccionados.size} informes?`);
+
+    if(!confirmar) return;
+
+    for(const id of seleccionados){
+
+      await deleteDoc(
+        doc(db,"registros",id)
+      );
+
+    }
+
+    seleccionados.clear();
+
+    actualizarBarraSeleccion();
+
+  });
+
+}
+
+function actualizarBarraSeleccion(){
+
+  if(!barraSeleccion) return;
+
+  cantidadSeleccionados.innerHTML =
+  seleccionados.size;
+
+  barraSeleccion.style.display =
+
+    seleccionados.size > 0
+    ? "flex"
+    : "none";
+
+}
+
+window.toggleSeleccion = function(id){
+
+  if(seleccionados.has(id)){
+
+    seleccionados.delete(id);
+
+  }else{
+
+    seleccionados.add(id);
+
+  }
+
+  actualizarBarraSeleccion();
+
+};
+
+window.abrirImagen = function(url){
+
+  const modal =
+  document.getElementById("imageModal");
+
+  const imagen =
+  document.getElementById("modalImage");
+
+  imagen.src = url;
+
+  modal.style.display = "flex";
+
+};
+
+const closeModal =
+document.getElementById("closeModal");
+
+if(closeModal){
+
+  closeModal.onclick = () => {
+
+    document.getElementById("imageModal")
+    .style.display = "none";
+
+  };
+
+}
+
+function obtenerClaseEstado(estado){
+
+  switch(estado){
+
+    case "Ok":
+      return "ok";
+
+    case "Observacion":
+      return "obs";
+
+    case "Urgente":
+      return "urg";
+
+    case "EnProceso":
+      return "proc";
+
+    case "Resuelto":
+      return "res";
+
+    default:
+      return "ok";
+
+  }
+
+}
 
 function mostrar(lista){
 
   contenedor.innerHTML = "";
 
-  totalRegistros.innerHTML = lista.length;
+  totalRegistros.innerHTML =
+  lista.length;
 
-  lista.forEach((registro,index) => {
-
-    let colorEstado = "#3b82f6";
-
-    if(registro.estado === "Observacion"){
-      colorEstado = "#f59e0b";
-    }
-
-    if(registro.estado === "Urgente"){
-      colorEstado = "#ef4444";
-    }
-
-    if(registro.estado === "EnProceso"){
-      colorEstado = "#8b5cf6";
-    }
-
-    if(registro.estado === "Resuelto"){
-      colorEstado = "#22c55e";
-    }
-
-    const textoId = "texto" + index;
-
-    const textoLargo =
-      registro.descripcion &&
-      registro.descripcion.length > 180;
+  lista.forEach((registro)=>{
 
     const imagenes =
-      registro.imagenes ||
-      (registro.imagen ? [registro.imagen] : []); // 🔧 FIX CRASH
+    registro.imagenes ||
+    (registro.imagen
+      ? [registro.imagen]
+      : []);
 
-    contenedor.innerHTML += `
+    const fila = document.createElement("div");
 
-      <div class="registro-card">
+    fila.className = "registro-row";
 
-        <div class="registro-header">
+    fila.innerHTML = `
 
-          <div>
+      <div>
 
-            <h3>
-              ${escapeHTML(registro.nombre || "")}
-            </h3>
+        ${
+          modoSeleccionActivo
+          ?
 
-            <div class="sector-mini">
-              ${registro.sector}
-            </div>
+          `<input
+            type="checkbox"
+            ${
+              seleccionados.has(registro.id)
+              ? "checked"
+              : ""
+            }
+            onchange="toggleSeleccion('${registro.id}')"
+          >`
 
-          </div>
+          : ""
 
-          <div class="estado"
-               style="background:${colorEstado}">
+        }
 
-            ${registro.estado}
+        <strong>
 
-          </div>
+          ${escapeHTML(
+            registro.nombre || ""
+          )}
 
-        </div>
+        </strong>
 
-        <div
-          class="descripcion ${textoLargo ? "oculta" : ""}"
-          id="${textoId}"
+      </div>
+
+      <div>
+        ${escapeHTML(
+          registro.sector || ""
+        )}
+      </div>
+
+      <div>
+
+        <span class="badge ${obtenerClaseEstado(registro.estado)}">
+
+          ${registro.estado || "Ok"}
+
+        </span>
+
+      </div>
+
+      <div>
+
+        ${registro.fecha || "-"}
+
+      </div>
+
+      <div>
+
+        ${registro.coordenadas || "-"}
+
+      </div>
+
+      <div>
+
+        ${
+          imagenes.length
+
+          ?
+
+          `<img
+            src="${imagenes[0]}"
+            class="preview-img"
+            onclick="abrirImagen('${imagenes[0]}')"
+          >`
+
+          :
+
+          "-"
+
+        }
+
+      </div>
+
+      <div class="action-group">
+
+        <button
+          class="btn-status"
+          onclick="cambiarEstado(
+            '${registro.id}',
+            '${registro.estado}'
+          )"
         >
 
-          ${escapeHTML(registro.descripcion || "")}
+          Estado
 
-        </div>
+        </button>
 
-        ${textoLargo ? `
+        <button
+          class="btn-delete"
+          onclick="eliminarRegistro(
+            '${registro.id}'
+          )"
+        >
 
-          <span
-            class="ver-mas"
-            onclick="toggleTexto('${textoId}')"
-          >
-            Ver más
-          </span>
+          Borrar
 
-        ` : ""}
-
-        <div class="info">
-
-          <span>
-            📍 ${registro.coordenadas || "Sin ubicación"}
-          </span>
-
-          <span>
-            🕒 ${registro.fecha || "Sin fecha"}
-          </span>
-
-        </div>
-
-        <div class="fotos-grid">
-
-          ${imagenes.map((img) => `
-
-            <a href="${img}" target="_blank">
-
-              <img src="${img}" class="preview-img">
-
-            </a>
-
-          `).join("")}
-
-        </div>
-
-        <div class="card-actions">
-
-          <button class="btn-status"
-            onclick="cambiarEstado('${registro.id}','${registro.estado}')">
-
-            Cambiar Estado
-
-          </button>
-
-          <button class="btn-delete"
-            onclick="eliminarRegistro('${registro.id}')">
-
-            Eliminar
-
-          </button>
-
-        </div>
+        </button>
 
       </div>
 
     `;
 
-  });
-
-}
-
-// FILTRAR (SIN TOCAR TU LOGICA)
-function filtrar(){
-
-  const texto = buscador.value.toLowerCase();
-  const estado = filtroEstado.value;
-  const fecha = filtroFecha.value;
-
-  const filtrados = registros.filter((r) => {
-
-    const coincideNombre =
-      (r.nombre || "").toLowerCase().includes(texto);
-
-    const coincideSector =
-      r.sector === sectorActual;
-
-    const coincideEstado =
-      estado === "Todos" || r.estado === estado;
-
-    let coincideFecha = true;
-
-    if(fecha){
-      coincideFecha =
-        r.fecha &&
-        r.fecha.includes(fecha);
-    }
-
-    return (
-      coincideNombre &&
-      coincideSector &&
-      coincideEstado &&
-      coincideFecha
-    );
+    contenedor.appendChild(fila);
 
   });
 
-  mostrar(filtrados);
+  document.addEventListener("click",(e)=>{
 
-}
+  const modal =
+  document.getElementById("imageModal");
 
-// EVENTOS
+  if(
+    modal &&
+    e.target === modal
+  ){
 
-buscador.addEventListener("input", filtrar);
-filtroEstado.addEventListener("change", filtrar);
-filtroFecha.addEventListener("change", filtrar);
+    modal.style.display = "none";
 
-// PDF
-
-exportarPDF.addEventListener("click", () => {
-  window.print();
-});
-
-// FIREBASE
-
-const q = query(collection(db,"registros"));
-
-onSnapshot(q, (snapshot) => {
-
-  registros = [];
-
-  snapshot.forEach((docu) => {
-
-    registros.push({
-      id: docu.id,
-      ...docu.data()
-    });
-
-  });
-
-  registros.reverse();
-  filtrar();
+  }
 
 });
+}
