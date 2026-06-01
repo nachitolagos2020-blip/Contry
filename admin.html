@@ -1,17 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
 
   <meta charset="UTF-8">
-
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>Country Admin</title>
 
-  <link rel="stylesheet"
-        href="admin.css">
+  <link rel="stylesheet" href="admin.css">
 
 </head>
 
@@ -19,9 +15,7 @@
 
   <div class="background"></div>
 
-  <!-- MENU -->
-
-  <button id="menuToggle">
+  <button id="menuToggle" class="menu-toggle">
     ☰
   </button>
 
@@ -29,39 +23,39 @@
 
     <!-- SIDEBAR -->
 
-    <aside class="sidebar"
-           id="sidebar">
+    <aside class="sidebar" id="sidebar">
 
-      <div>
+      <div class="sidebar-header">
 
-        <h1>
-          Country
-        </h1>
+        <div class="logo-circle">
+          C
+        </div>
 
-        <p>
-          Panel de Supervisión
-        </p>
+        <div>
+          <h1>Country</h1>
+          <p>Panel de Supervisión</p>
+        </div>
 
       </div>
 
-      <div class="sidebar-box">
+      <div class="stats-card">
 
-        <span id="totalRegistros">
-          0
-        </span>
+        <span id="totalRegistros">0</span>
 
-        Informes Totales
+        <small>Informes Totales</small>
 
       </div>
 
       <div class="sidebar-actions">
-         <button id="modoSeleccion">
-  ✔ Seleccionar
-</button>
 
-<button id="eliminarSeleccionados" style="display:none;">
-  🗑 Eliminar seleccionados
-</button>
+        <button id="modoSeleccion">
+          ✔ Seleccionar
+        </button>
+
+        <button id="eliminarSeleccionados" style="display:none;">
+          🗑 Eliminar seleccionados
+        </button>
+
         <button id="modoBtn">
           🌙 Modo Oscuro
         </button>
@@ -72,48 +66,34 @@
 
       </div>
 
+      <div class="sidebar-title">
+        Sectores
+      </div>
+
       <div class="sectores">
 
-        <button class="sector-btn active"
-                data-sector="Campo">
-
+        <button class="sector-btn active" data-sector="Campo">
           🌱 Campo
-
         </button>
 
-        <button class="sector-btn"
-                data-sector="Electricidad">
-
+        <button class="sector-btn" data-sector="Electricidad">
           ⚡ Electricidad
-
         </button>
 
-        <button class="sector-btn"
-                data-sector="Plomeria">
-
-          🚰 Plomeria
-
+        <button class="sector-btn" data-sector="Plomeria">
+          🚰 Plomería
         </button>
 
-        <button class="sector-btn"
-                data-sector="Tecnica">
-
-          🛠 Tecnica
-
+        <button class="sector-btn" data-sector="Tecnica">
+          🛠 Técnica
         </button>
 
-        <button class="sector-btn"
-                data-sector="Mantenimiento">
-
+        <button class="sector-btn" data-sector="Mantenimiento">
           🔧 Mantenimiento
-
         </button>
 
-        <button class="sector-btn"
-                data-sector="Taller">
-
+        <button class="sector-btn" data-sector="Taller">
           🚗 Taller
-
         </button>
 
       </div>
@@ -122,56 +102,52 @@
 
     <!-- MAIN -->
 
-    <main class="admin-main"
-          id="adminMain">
+    <main class="admin-main" id="adminMain">
 
-      <div class="top-panel">
+      <!-- HEADER -->
 
-        <div class="top-info">
+      <div class="dashboard-header">
 
-          <h2>
-            Informes
-          </h2>
+        <div>
+
+          <h2>Centro de Informes</h2>
 
           <p>
-            Registros en tiempo real
+            Administración y seguimiento en tiempo real
           </p>
 
         </div>
 
+        <div class="fecha-actual" id="fechaActual"></div>
+
+      </div>
+
+      <!-- FILTROS -->
+
+      <div class="top-panel">
+
         <div class="filtros">
 
-          <input
-            type="text"
-            id="buscador"
-            placeholder="Buscar trabajador..."
-          >
+          <div class="input-group">
+
+            <span>🔎</span>
+
+            <input
+              type="text"
+              id="buscador"
+              placeholder="Buscar trabajador..."
+            >
+
+          </div>
 
           <select id="filtroEstado">
 
-            <option value="Todos">
-              Todos
-            </option>
-
-            <option value="Ok">
-              Ok
-            </option>
-
-            <option value="Observacion">
-              Observacion
-            </option>
-
-            <option value="Urgente">
-              Urgente
-            </option>
-
-            <option value="EnProceso">
-              En Proceso
-            </option>
-
-            <option value="Resuelto">
-              Resuelto
-            </option>
+            <option value="Todos">Todos</option>
+            <option value="Ok">Ok</option>
+            <option value="Observacion">Observación</option>
+            <option value="Urgente">Urgente</option>
+            <option value="EnProceso">En Proceso</option>
+            <option value="Resuelto">Resuelto</option>
 
           </select>
 
@@ -180,25 +156,81 @@
             id="filtroFecha"
           >
 
-          <div class="fecha-actual"
-               id="fechaActual">
+        </div>
 
-          </div>
+      </div>
+
+      <!-- ACCIONES MASIVAS -->
+
+      <div id="barraSeleccion" class="barra-seleccion">
+
+        <div>
+
+          <span id="cantidadSeleccionados">
+            0
+          </span>
+
+          registros seleccionados
+
+        </div>
+
+        <div>
+
+          <button id="accionEstadoMasivo">
+            Cambiar Estado
+          </button>
+
+          <button id="accionEliminarMasivo">
+            Eliminar
+          </button>
 
         </div>
 
       </div>
 
-      <div id="contenedorRegistros"></div>
+      <!-- LISTADO -->
+
+      <div class="tabla-container">
+
+        <div class="tabla-header">
+
+          <div>Empleado</div>
+
+          <div>Sector</div>
+
+          <div>Estado</div>
+
+          <div>Fecha</div>
+
+          <div>Ubicación</div>
+
+          <div>Fotos</div>
+
+          <div>Acciones</div>
+
+        </div>
+
+        <div id="contenedorRegistros"></div>
+
+      </div>
 
     </main>
 
   </div>
 
-  <script type="module"
-          src="admin.js">
+  <!-- MODAL IMAGEN -->
 
-  </script>
+  <div id="imageModal" class="image-modal">
+
+    <span id="closeModal">
+      ✕
+    </span>
+
+    <img id="modalImage">
+
+  </div>
+
+  <script type="module" src="admin.js"></script>
 
 </body>
 </html>
