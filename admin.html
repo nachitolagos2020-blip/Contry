@@ -9,14 +9,46 @@
     <link rel="stylesheet" href="admin.css">
 </head>
 
+Y reemplazalo por esto:
+
 <body>
 
-    <div class="background"></div>
+<div id="loginScreen" class="login-screen">
 
-    <!-- MENU -->
-    <button id="menuToggle">☰</button>
+    <div class="login-card">
 
-    <div class="admin-layout">
+        <div class="login-icon">
+            🔒
+        </div>
+
+        <h1>Country Admin</h1>
+        <p>Panel de Supervisión</p>
+
+        <label>Contraseña</label>
+
+        <input
+            type="password"
+            id="passwordInput"
+            placeholder="Ingresa la contraseña"
+        >
+
+        <button id="loginBtn">
+            Ingresar
+        </button>
+
+        <div id="loginError"></div>
+
+    </div>
+
+</div>
+
+<div id="adminPanel" style="display:none;">
+
+<div class="background"></div>
+
+<button id="menuToggle">☰</button>
+
+<div class="admin-layout">
 
         <!-- SIDEBAR -->
         <aside class="sidebar" id="sidebar">
@@ -118,6 +150,8 @@
             <div id="contenedorRegistros"></div>
 
         </main>
+
+    </div>
 
     </div>
 
