@@ -9,16 +9,6 @@ import {
   updateDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-// LOGIN
-const password = prompt("Contraseña");
-
-if (password !== "country2026") {
-  document.body.innerHTML = `
-    <div class="login-error">
-      Contraseña incorrecta
-    </div>
-  `;
-  throw new Error("Sin acceso");
 }
 
 // FIREBASE
