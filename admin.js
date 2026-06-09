@@ -30,7 +30,6 @@ document
 
     }
 });
-}
 
 // FIREBASE
 const firebaseConfig = {
