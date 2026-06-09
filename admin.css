@@ -437,3 +437,35 @@ body.dark .descripcion{
     text-align:center;
     color:#ef4444;
 }
+.acciones-informes{
+    display:flex;
+    gap:10px;
+    margin-top:15px;
+    flex-wrap:wrap;
+}
+
+.acciones-informes button{
+    border:none;
+    padding:12px 16px;
+    border-radius:12px;
+    cursor:pointer;
+    font-weight:700;
+    background:#111827;
+    color:white;
+}
+
+.tema-btn{
+    width:100%;
+    margin-top:20px;
+    border:none;
+    padding:16px;
+    border-radius:16px;
+    background:linear-gradient(
+        145deg,
+        #2d2d2d,
+        #252525
+    );
+    color:white;
+    font-weight:700;
+    cursor:pointer;
+}
