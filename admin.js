@@ -8,7 +8,28 @@ import {
   doc,
   updateDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const CLAVE = "country2026";
 
+document
+.getElementById("loginBtn")
+.addEventListener("click", () => {
+
+    const valor =
+        document.getElementById("passwordInput").value;
+
+    if(valor === CLAVE){
+
+        document.getElementById("loginScreen").style.display = "none";
+
+        document.getElementById("adminPanel").style.display = "block";
+
+    }else{
+
+        document.getElementById("loginError").innerHTML =
+            "Contraseña incorrecta";
+
+    }
+});
 }
 
 // FIREBASE
