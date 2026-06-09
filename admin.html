@@ -1,236 +1,128 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Country Admin</title>
 
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>Country Admin</title>
-
-  <link rel="stylesheet" href="admin.css">
-
+    <link rel="stylesheet" href="admin.css">
 </head>
 
 <body>
 
-  <div class="background"></div>
+    <div class="background"></div>
+
+    <!-- MENU -->
+    <button id="menuToggle">☰</button>
 
-  <button id="menuToggle" class="menu-toggle">
-    ☰
-  </button>
+    <div class="admin-layout">
 
-  <div class="admin-layout">
+        <!-- SIDEBAR -->
+        <aside class="sidebar" id="sidebar">
 
-    <!-- SIDEBAR -->
+            <div>
+                <h1>Country</h1>
+                <p>Panel de Supervisión</p>
+            </div>
 
-    <aside class="sidebar" id="sidebar">
+            <div class="sidebar-box">
+                <span id="totalRegistros">0</span>
+                Informes Totales
+            </div>
 
-      <div class="sidebar-header">
+            <div class="sidebar-actions">
+                <button id="modoSeleccion">✔ Seleccionar</button>
+                <button id="eliminarSeleccionados" style="display:none;">
+                    🗑 Eliminar seleccionados
+                </button>
 
-        <div class="logo-circle">
-          C
-        </div>
+                <button id="modoBtn">
+                    🌙 Modo Oscuro
+                </button>
 
-        <div>
-          <h1>Country</h1>
-          <p>Panel de Supervisión</p>
-        </div>
+                <button id="exportarPDF">
+                    📄 Exportar PDF
+                </button>
+            </div>
 
-      </div>
+            <div class="sectores">
+                <button class="sector-btn active" data-sector="Campo">
+                    🌱 Campo
+                </button>
 
-      <div class="stats-card">
+                <button class="sector-btn" data-sector="Electricidad">
+                    ⚡ Electricidad
+                </button>
 
-        <span id="totalRegistros">0</span>
+                <button class="sector-btn" data-sector="Plomeria">
+                    🚰 Plomeria
+                </button>
 
-        <small>Informes Totales</small>
+                <button class="sector-btn" data-sector="Tecnica">
+                    🛠 Tecnica
+                </button>
 
-      </div>
+                <button class="sector-btn" data-sector="Mantenimiento">
+                    🔧 Mantenimiento
+                </button>
 
-      <div class="sidebar-actions">
+                <button class="sector-btn" data-sector="Taller">
+                    🚗 Taller
+                </button>
+            </div>
 
-        <button id="modoSeleccion">
-          ✔ Seleccionar
-        </button>
+        </aside>
 
-        <button id="eliminarSeleccionados" style="display:none;">
-          🗑 Eliminar seleccionados
-        </button>
+        <!-- MAIN -->
+        <main class="admin-main" id="adminMain">
 
-        <button id="modoBtn">
-          🌙 Modo Oscuro
-        </button>
+            <div class="top-panel">
 
-        <button id="exportarPDF">
-          📄 Exportar PDF
-        </button>
+                <div class="top-info">
+                    <h2>Informes</h2>
+                    <p>Registros en tiempo real</p>
+                </div>
 
-      </div>
+                <div class="filtros">
 
-      <div class="sidebar-title">
-        Sectores
-      </div>
+                    <input
+                        type="text"
+                        id="buscador"
+                        placeholder="Buscar trabajador..."
+                    >
 
-      <div class="sectores">
+                    <select id="filtroEstado">
+                        <option value="Todos">Todos</option>
+                        <option value="Ok">Ok</option>
+                        <option value="Observacion">Observacion</option>
+                        <option value="Urgente">Urgente</option>
+                        <option value="EnProceso">En Proceso</option>
+                        <option value="Resuelto">Resuelto</option>
+                    </select>
 
-        <button class="sector-btn active" data-sector="Campo">
-          🌱 Campo
-        </button>
+                    <input
+                        type="date"
+                        id="filtroFecha"
+                    >
 
-        <button class="sector-btn" data-sector="Electricidad">
-          ⚡ Electricidad
-        </button>
+                    <div
+                        class="fecha-actual"
+                        id="fechaActual">
+                    </div>
 
-        <button class="sector-btn" data-sector="Plomeria">
-          🚰 Plomería
-        </button>
+                </div>
 
-        <button class="sector-btn" data-sector="Tecnica">
-          🛠 Técnica
-        </button>
+            </div>
 
-        <button class="sector-btn" data-sector="Mantenimiento">
-          🔧 Mantenimiento
-        </button>
+            <div id="contenedorRegistros"></div>
 
-        <button class="sector-btn" data-sector="Taller">
-          🚗 Taller
-        </button>
+        </main>
 
-      </div>
+    </div>
 
-    </aside>
-
-    <!-- MAIN -->
-
-    <main class="admin-main" id="adminMain">
-
-      <!-- HEADER -->
-
-      <div class="dashboard-header">
-
-        <div>
-
-          <h2>Centro de Informes</h2>
-
-          <p>
-            Administración y seguimiento en tiempo real
-          </p>
-
-        </div>
-
-        <div class="fecha-actual" id="fechaActual"></div>
-
-      </div>
-
-      <!-- FILTROS -->
-
-      <div class="top-panel">
-
-        <div class="filtros">
-
-          <div class="input-group">
-
-            <span>🔎</span>
-
-            <input
-              type="text"
-              id="buscador"
-              placeholder="Buscar trabajador..."
-            >
-
-          </div>
-
-          <select id="filtroEstado">
-
-            <option value="Todos">Todos</option>
-            <option value="Ok">Ok</option>
-            <option value="Observacion">Observación</option>
-            <option value="Urgente">Urgente</option>
-            <option value="EnProceso">En Proceso</option>
-            <option value="Resuelto">Resuelto</option>
-
-          </select>
-
-          <input
-            type="date"
-            id="filtroFecha"
-          >
-
-        </div>
-
-      </div>
-
-      <!-- ACCIONES MASIVAS -->
-
-      <div id="barraSeleccion" class="barra-seleccion">
-
-        <div>
-
-          <span id="cantidadSeleccionados">
-            0
-          </span>
-
-          registros seleccionados
-
-        </div>
-
-        <div>
-
-          <button id="accionEstadoMasivo">
-            Cambiar Estado
-          </button>
-
-          <button id="accionEliminarMasivo">
-            Eliminar
-          </button>
-
-        </div>
-
-      </div>
-
-      <!-- LISTADO -->
-
-      <div class="tabla-container">
-
-        <div class="tabla-header">
-
-          <div>Empleado</div>
-
-          <div>Sector</div>
-
-          <div>Estado</div>
-
-          <div>Fecha</div>
-
-          <div>Ubicación</div>
-
-          <div>Fotos</div>
-
-          <div>Acciones</div>
-
-        </div>
-
-        <div id="contenedorRegistros"></div>
-
-      </div>
-
-    </main>
-
-  </div>
-
-  <!-- MODAL IMAGEN -->
-
-  <div id="imageModal" class="image-modal">
-
-    <span id="closeModal">
-      ✕
-    </span>
-
-    <img id="modalImage">
-
-  </div>
-
-  <script type="module" src="admin.js"></script>
+    <script type="module" src="admin.js"></script>
 
 </body>
+
 </html>
